@@ -1,7 +1,7 @@
 package com.fhsh.daitda.deliverymanager.domain.entity;
 
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
-import com.fhsh.daitda.domain.BaseEntity;
+import com.fhsh.daitda.domain.BaseUserEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -15,7 +15,7 @@ import java.util.UUID;
 @Getter
 @Table(name = "p_delivery_managers")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class DeliveryManager extends BaseEntity {
+public class DeliveryManager extends BaseUserEntity {
 
     @Id
     @GeneratedValue
