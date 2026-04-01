@@ -37,7 +37,7 @@ public class DeliveryManager extends BaseUserEntity {
     private boolean isDelivery;
 
     @Builder
-    public DeliveryManager(UUID userId, UUID hubId, String slackId, DeliveryManagerType type, Integer sequence, boolean isDelivery) {
+    public DeliveryManager(UUID userId, UUID hubId, String slackId, DeliveryManagerType type, int sequence, boolean isDelivery) {
         this.managerInfo = new ManagerInfo(userId, hubId, slackId);
 
         this.type = type;
