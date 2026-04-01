@@ -13,4 +13,4 @@ keycloak:
 logging:
   level:
     org.hibernate.SQL: DEBUG
-    com.yourproject.userservice: DEBUG
+    com.fhsh.daitda: DEBUG
