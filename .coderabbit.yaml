@@ -4,7 +4,7 @@
 language: ko-KR
 
 reviews:
-  profile: "balanced"
+  profile: "chill"
   request_changes_workflow: false
   high_level_summary: true
   changed_files_summary: false
@@ -14,5 +14,8 @@ reviews:
   auto_review:
     enabled: true
     drafts: true
+    base_branches:
+      - "main"
+      - "dev"
 chat:
   auto_reply: true
