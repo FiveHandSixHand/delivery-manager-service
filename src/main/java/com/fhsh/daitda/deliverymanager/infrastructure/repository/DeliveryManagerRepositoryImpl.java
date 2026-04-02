@@ -15,12 +15,12 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
     private final DeliveryManagerJpaRepository deliveryManagerJpaRepository;
 
     @Override
-    public DeliveryManager save(DeliveryManager deliveryManager) {
-        return deliveryManagerJpaRepository.save(deliveryManager);
+    public Optional<DeliveryManager> findById(UUID deliveryManagerId) {
+        return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNull(deliveryManagerId);
     }
 
     @Override
-    public Optional<DeliveryManager> findById(UUID deliveryManagerId) {
-        return deliveryManagerJpaRepository.findByDeliveryManagerIdAndDeletedAtIsNull(deliveryManagerId);
+    public DeliveryManager save(DeliveryManager deliveryManager) {
+        return deliveryManagerJpaRepository.save(deliveryManager);
     }
 }

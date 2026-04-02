@@ -6,7 +6,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DeliveryManagerRepository {
-    DeliveryManager save(DeliveryManager deliveryManager);
-
     Optional<DeliveryManager> findById(UUID deliveryManagerId);
+
+    DeliveryManager save(DeliveryManager deliveryManager);
 }
