@@ -4,12 +4,13 @@ import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerQueryRepository;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.CaseBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.fhsh.daitda.deliverymanager.domain.entity.QDeliveryManager.deliveryManager;
@@ -20,49 +21,70 @@ public class DeliveryManagerQueryRepositoryImpl implements DeliveryManagerQueryR
 
     private final JPAQueryFactory queryFactory;
 
+    // 단건 조회
     @Override
-    public List<DeliveryManager> findByTypeAndHubIdOrderBySequence(DeliveryManagerType type, UUID hubId) {
+    public Optional<DeliveryManager> findById(UUID deliveryManagerId) {
+        DeliveryManager result = queryFactory
+                .selectFrom(deliveryManager)
+                .where(
+                        deliveryManager.deliveryManagerId.eq(deliveryManagerId),
+                        isNotDeleted()
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
+    // 생성일순 목록 조회
+    @Override
+    public List<DeliveryManager> findAllByHubIdAndTypeOrderByCreatedAtAsc(UUID hubId, DeliveryManagerType type) {
         return queryFactory
                 .selectFrom(deliveryManager)
                 .where(
-                        deliveryManager.type.eq(type),
+                        isNotDeleted(),
                         eqHubId(hubId),
-                        deliveryManager.deletedAt.isNull()
+                        eqType(type)
                 )
-                .orderBy(deliveryManager.sequence.asc())
+                .orderBy(createdAtAsc(), updatedAtAsc())
                 .fetch();
     }
 
+    // 수정일순 목록 조회
     @Override
-    public List<DeliveryManager> findByTypeAndHubIdStartingFromSequence(
-            DeliveryManagerType type,
-            UUID hubId,
-            int startSequence
-    ) {
+    public List<DeliveryManager> findAllByHubIdAndTypeOrderByUpdatedAtAsc(UUID hubId, DeliveryManagerType type) {
         return queryFactory
                 .selectFrom(deliveryManager)
                 .where(
-                        deliveryManager.type.eq(type),
+                        isNotDeleted(),
                         eqHubId(hubId),
-                        deliveryManager.deletedAt.isNull()
+                        eqType(type)
                 )
-                .orderBy(
-                        sequencePriority(startSequence),
-                        deliveryManager.sequence.asc()
-                )
+                .orderBy(updatedAtAsc(), createdAtAsc())
                 .fetch();
     }
 
-    private com.querydsl.core.types.Predicate eqHubId(UUID hubId) {
-        return hubId == null
-                ? deliveryManager.managerInfo.hubId.isNull()
-                : deliveryManager.managerInfo.hubId.eq(hubId);
+    // 삭제 여부
+    private BooleanExpression isNotDeleted() {
+        return deliveryManager.deletedAt.isNull();
     }
 
-    private OrderSpecifier<Integer> sequencePriority(int startSequence) {
-        return new CaseBuilder()
-                .when(deliveryManager.sequence.goe(startSequence)).then(0)
-                .otherwise(1)
-                .asc();
+    // 허브 아이디 확인
+    private BooleanExpression eqHubId(UUID hubId) {
+        return hubId == null ? null : deliveryManager.managerInfo.hubId.eq(hubId);
+    }
+
+    // 타입 확인
+    private BooleanExpression eqType(DeliveryManagerType type) {
+        return type == null ? null : deliveryManager.type.eq(type);
+    }
+
+    // 생성일 오름차순
+    private OrderSpecifier<?> createdAtAsc() {
+        return deliveryManager.createdAt.asc();
+    }
+
+    // 수정일 오름차순
+    private OrderSpecifier<?> updatedAtAsc() {
+        return deliveryManager.updatedAt.asc();
     }
 }
