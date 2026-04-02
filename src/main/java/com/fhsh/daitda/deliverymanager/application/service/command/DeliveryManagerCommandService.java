@@ -5,13 +5,10 @@ import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManager
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
-import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerQueryRepository;
 import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +16,6 @@ import java.util.UUID;
 public class DeliveryManagerCommandService {
 
     private final DeliveryManagerRepository deliveryManagerRepository;
-    private final DeliveryManagerQueryRepository deliveryManagerQueryRepository;
     private final UserClient userClient;
 
     public void createDeliveryManager(CreateDeliveryManagerCommand command) {
@@ -29,12 +25,12 @@ public class DeliveryManagerCommandService {
         // 사용자 정보 검증
         validateUser(userInfo, command);
 
-        if (deliveryManagerQueryRepository.existsByUserId(userInfo.userId())) {
+        if (deliveryManagerRepository.existsByUserId(userInfo.userId())) {
             throw new IllegalArgumentException("이미 등록된 배송담당자입니다.");
         }
 
         // 배송담당자 순번 지정
-        Integer lastSequence = deliveryManagerQueryRepository.findLastSequence(
+        Integer lastSequence = deliveryManagerRepository.findLastSequence(
                 command.type(), userInfo.hubId());
         int nextSequence = (lastSequence == null) ? 1 : lastSequence + 1;
 
