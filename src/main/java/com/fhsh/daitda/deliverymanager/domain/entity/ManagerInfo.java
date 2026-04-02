@@ -14,12 +14,13 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ManagerInfo {
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "hub_id")
     private UUID hubId;
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "slack_id", length = 100, nullable = false)
     private String slackId;
 
     protected ManagerInfo(UUID userId, UUID hubId, String slackId) {

@@ -25,7 +25,13 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@Table(name = "p_delivery_managers")
+@Table(name = "p_delivery_managers",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_delivery_manager_user_id",
+                        columnNames = "user_id"
+                )
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DeliveryManager extends BaseUserEntity {
 
