@@ -22,10 +22,45 @@ public class ManagerInfo {
     @Column(length = 100, nullable = false)
     private String slackId;
 
-    @Builder
     protected ManagerInfo(UUID userId, UUID hubId, String slackId) {
+        validate(userId, slackId);
+
         this.userId = userId;
         this.hubId = hubId;
         this.slackId = slackId;
+    }
+
+    // 생성
+    public static ManagerInfo of(UUID userId, UUID hubId, String slackId) {
+        return new ManagerInfo(userId, hubId, slackId);
+    }
+
+    // 허브 소속인지 확인
+    public boolean hasHub() {
+        return this.hubId != null;
+    }
+
+    // 특정 허브의 소속인지 확인
+    public boolean belongsTo(UUID hubId) {
+        return this.hubId != null && this.hubId.equals(hubId);
+    }
+
+    // 슬랙 아이디 변경
+    public ManagerInfo withSlackId(String slackId) {
+        return new ManagerInfo(this.userId, this.hubId, slackId);
+    }
+
+    // 허브 아이디 변경
+    public ManagerInfo withHubId(UUID hubId) {
+        return new ManagerInfo(this.userId, hubId, this.slackId);
+    }
+
+    private static void validate(UUID userId, String slackId) {
+        if (userId == null) {
+            throw new IllegalArgumentException("userId는 필수입니다.");
+        }
+        if (slackId == null || slackId.isBlank()) {
+            throw new IllegalArgumentException("slackId는 필수입니다.");
+        }
     }
 }
