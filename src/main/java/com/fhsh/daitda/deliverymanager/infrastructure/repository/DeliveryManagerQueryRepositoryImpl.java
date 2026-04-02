@@ -63,6 +63,44 @@ public class DeliveryManagerQueryRepositoryImpl implements DeliveryManagerQueryR
                 .fetch();
     }
 
+    @Override
+    public boolean existsByUserId(UUID userId) {
+        Integer result = queryFactory
+                .selectOne()
+                .from(deliveryManager)
+                .where(
+                        deliveryManager.managerInfo.userId.eq(userId),
+                        deliveryManager.deletedAt.isNull()
+                )
+                .fetchFirst();
+
+        return result != null;
+    }
+
+    @Override
+    public Integer findLastSequence(DeliveryManagerType type, UUID hubId) {
+        if (type == DeliveryManagerType.COMPANY) {
+            return queryFactory
+                    .select(deliveryManager.sequence.max())
+                    .from(deliveryManager)
+                    .where(
+                            deliveryManager.type.eq(type),
+                            deliveryManager.managerInfo.hubId.eq(hubId),
+                            deliveryManager.deletedAt.isNull()
+                    )
+                    .fetchOne();
+        }
+
+        return queryFactory
+                .select(deliveryManager.sequence.max())
+                .from(deliveryManager)
+                .where(
+                        deliveryManager.type.eq(type),
+                        deliveryManager.deletedAt.isNull()
+                )
+                .fetchOne();
+    }
+
     // 삭제 여부
     private BooleanExpression isNotDeleted() {
         return deliveryManager.deletedAt.isNull();

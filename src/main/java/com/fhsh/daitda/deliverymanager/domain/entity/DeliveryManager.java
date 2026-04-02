@@ -55,13 +55,13 @@ public class DeliveryManager extends BaseUserEntity {
     private Long version;
 
     @Builder
-    public DeliveryManager(UUID userId, UUID hubId, String slackId, DeliveryManagerType type, int sequence) {
+    public DeliveryManager(UUID userId, UUID hubId, String slackId, DeliveryManagerType type, int sequence, boolean isDelivery) {
         validate(type, hubId, sequence);
 
         this.managerInfo = ManagerInfo.of(userId, hubId, slackId);
         this.type = type;
         this.sequence = sequence;
-        this.isDelivery = false;
+        this.isDelivery = isDelivery;
     }
 
     // 배송담당자 생성
@@ -73,6 +73,7 @@ public class DeliveryManager extends BaseUserEntity {
                 .slackId(slackId)
                 .type(type)
                 .sequence(sequence)
+                .isDelivery(false)
                 .build();
     }
 
