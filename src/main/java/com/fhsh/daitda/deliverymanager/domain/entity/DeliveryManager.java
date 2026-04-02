@@ -64,7 +64,7 @@ public class DeliveryManager extends BaseUserEntity {
         this.isDelivery = false;
     }
 
-    // 생성
+    // 배송담당자 생성
     public static DeliveryManager create(UUID userId, UUID hubId, String slackId,
                                          DeliveryManagerType type, int sequence) {
         return DeliveryManager.builder()
@@ -91,6 +91,11 @@ public class DeliveryManager extends BaseUserEntity {
     public void changeSequence(int sequence) {
         validateSequence(sequence);
         this.sequence = sequence;
+    }
+
+    // 배송담당자 삭제
+    public void delete(String deletedBy) {
+        super.delete(deletedBy);
     }
 
     // 배송중 상태인지 확인하는 메서드
