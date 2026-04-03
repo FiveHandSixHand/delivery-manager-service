@@ -8,7 +8,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum DeliveryManagerErrorCode implements ErrorCode {
-    DELETE_ME(HttpStatus.CONFLICT, "작성을 위한 예시입니다.");
+    USER_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 서비스 호출에 실패했습니다.");
 
     private final HttpStatus status;
     private final String description;
