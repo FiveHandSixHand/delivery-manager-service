@@ -34,6 +34,10 @@ public class DeliveryManagerCommandService {
                 command.type(), userInfo.hubId());
         int nextSequence = (lastSequence == null) ? 1 : lastSequence + 1;
 
+        if (nextSequence > 10) {
+            throw new IllegalArgumentException("배송담당자는 최대 10명까지만 등록할 수 있습니다.");
+        }
+
         // 배송담당자 생성
         DeliveryManager deliveryManager = DeliveryManager.create(
                 userInfo.userId(),
