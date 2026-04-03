@@ -3,6 +3,7 @@ package com.fhsh.daitda.deliverymanager.application.service.command;
 import com.fhsh.daitda.deliverymanager.application.client.UserLookupService;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
+import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
@@ -20,7 +21,7 @@ public class DeliveryManagerCommandService {
     private final DeliveryManagerRepository deliveryManagerRepository;
     private final UserLookupService userLookupService;
 
-    public void createDeliveryManager(CreateDeliveryManagerCommand command) {
+    public CreateDeliveryManagerResult createDeliveryManager(CreateDeliveryManagerCommand command) {
         // user-service에서 사용자 정보 받아오기
         UserInfoCommand userInfo = userLookupService.getUser(command.targetUserId());
 
@@ -49,7 +50,9 @@ public class DeliveryManagerCommandService {
                 nextSequence
         );
 
-        deliveryManagerRepository.save(deliveryManager);
+        DeliveryManager saved = deliveryManagerRepository.save(deliveryManager);
+
+        return new CreateDeliveryManagerResult(saved.getDeliveryManagerId());
     }
 
     private void validateUser(UserInfoCommand userInfo, CreateDeliveryManagerCommand command) {
