@@ -6,6 +6,7 @@ import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode
 import com.fhsh.daitda.deliverymanager.infrastructure.external.dto.ApiResponse;
 import com.fhsh.daitda.deliverymanager.infrastructure.external.dto.UserResponse;
 import com.fhsh.daitda.exception.BusinessException;
+import com.fhsh.daitda.response.CommonResponse;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -20,17 +21,13 @@ public class UserAdapter implements UserClient {
 
     @Override
     public UserInfoCommand getUser(UUID userId) {
-        try {
-            ApiResponse<UserResponse> apiResponse = userFeignClient.getUser(userId);
-            UserResponse response = apiResponse.data();
+        CommonResponse<UserResponse> feignResponse = userFeignClient.getUser(userId);
+        UserResponse response = feignResponse.getData();
 
-            if (response == null) {
-                return null;
-            }
-
-            return new UserInfoCommand(response.userId(), response.hubId(), response.slackUserId());
-        } catch (FeignException e) {
-            throw new BusinessException(DeliveryManagerErrorCode.USER_SERVICE_ERROR);
+        if (response == null) {
+            return null;
         }
+
+        return new UserInfoCommand(response.userId(), response.hubId(), response.slackUserId());
     }
 }
