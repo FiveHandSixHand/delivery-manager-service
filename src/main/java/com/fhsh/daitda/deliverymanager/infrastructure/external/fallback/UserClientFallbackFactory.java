@@ -1,6 +1,5 @@
 package com.fhsh.daitda.deliverymanager.infrastructure.external.fallback;
 
-import com.fhsh.daitda.deliverymanager.application.client.UserClient;
 import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
 import com.fhsh.daitda.deliverymanager.infrastructure.external.UserFeignClient;
 import com.fhsh.daitda.deliverymanager.infrastructure.external.dto.UserResponse;

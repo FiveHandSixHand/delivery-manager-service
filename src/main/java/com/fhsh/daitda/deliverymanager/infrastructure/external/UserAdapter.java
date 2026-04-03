@@ -2,12 +2,8 @@ package com.fhsh.daitda.deliverymanager.infrastructure.external;
 
 import com.fhsh.daitda.deliverymanager.application.client.UserClient;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
-import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
-import com.fhsh.daitda.deliverymanager.infrastructure.external.dto.ApiResponse;
 import com.fhsh.daitda.deliverymanager.infrastructure.external.dto.UserResponse;
-import com.fhsh.daitda.exception.BusinessException;
 import com.fhsh.daitda.response.CommonResponse;
-import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
