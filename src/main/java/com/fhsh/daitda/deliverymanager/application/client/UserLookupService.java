@@ -44,6 +44,7 @@ public class UserLookupService {
             throw new BusinessException(DeliveryManagerErrorCode.USER_NOT_FOUND);
         }
 
+        // NotFound 외 가티 예외는 모두 서비스 에러로 처리
         throw new BusinessException(DeliveryManagerErrorCode.USER_SERVICE_ERROR);
     }
 }
