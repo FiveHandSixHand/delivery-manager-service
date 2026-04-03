@@ -1,6 +1,6 @@
 package com.fhsh.daitda.deliverymanager.application.service.command;
 
-import com.fhsh.daitda.deliverymanager.application.client.UserClient;
+import com.fhsh.daitda.deliverymanager.application.client.UserLookupService;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
@@ -18,11 +18,11 @@ import org.springframework.transaction.annotation.Transactional;
 public class DeliveryManagerCommandService {
 
     private final DeliveryManagerRepository deliveryManagerRepository;
-    private final UserClient userClient;
+    private final UserLookupService userLookupService;
 
     public void createDeliveryManager(CreateDeliveryManagerCommand command) {
         // user-service에서 사용자 정보 받아오기
-        UserInfoCommand userInfo = userClient.getUser(command.targetUserId());
+        UserInfoCommand userInfo = userLookupService.getUser(command.targetUserId());
 
         // 사용자 정보 검증
         validateUser(userInfo, command);
