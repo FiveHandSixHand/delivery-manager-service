@@ -141,7 +141,7 @@ public class DeliveryManagerCommandServiceTest {
             assertThatThrownBy(() -> managerService.createDeliveryManager(command))
                     .isInstanceOf(BusinessException.class)
                     .extracting("errorCode")
-                    .isEqualTo(DeliveryManagerErrorCode.DELIVERY_MANAGER_HUB_REQUIRED);
+                    .isEqualTo(DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_HUB_ID_REQUIRED);
 
             verify(managerRepository, never()).save(any(DeliveryManager.class));
         }

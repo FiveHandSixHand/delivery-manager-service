@@ -1,6 +1,8 @@
 package com.fhsh.daitda.deliverymanager.domain.entity;
 
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
+import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
+import com.fhsh.daitda.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -43,8 +45,9 @@ public class DeliveryManagerTest {
                         DeliveryManagerType.COMPANY,
                         1
                 )
-        ).isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("업체 배송 담당자는 허브 ID가 필수입니다.");
+        ).isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_HUB_ID_REQUIRED);
     }
 
     @Test
