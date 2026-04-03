@@ -1,9 +1,10 @@
 package com.fhsh.daitda.deliverymanager.domain.entity;
 
+import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
+import com.fhsh.daitda.exception.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -58,10 +59,10 @@ public class ManagerInfo {
 
     private static void validate(UUID userId, String slackId) {
         if (userId == null) {
-            throw new IllegalArgumentException("userId는 필수입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.USER_ID_REQUIRED);
         }
         if (slackId == null || slackId.isBlank()) {
-            throw new IllegalArgumentException("slackId는 필수입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.SLACK_ID_REQUIRED);
         }
     }
 }

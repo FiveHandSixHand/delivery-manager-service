@@ -58,11 +58,11 @@ public class DeliveryManagerCommandService {
         }
 
         if (command.type() == DeliveryManagerType.COMPANY && userInfo.hubId() == null) {
-            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_HUB_REQUIRED);
+            throw new BusinessException(DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_HUB_ID_REQUIRED);
         }
 
         if (userInfo.slackUserId() == null || userInfo.slackUserId().isBlank()) {
-            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_SLACK_ID_REQUIRED);
+            throw new BusinessException(DeliveryManagerErrorCode.SLACK_ID_REQUIRED);
         }
     }
 }
