@@ -1,7 +1,9 @@
 package com.fhsh.daitda.deliverymanager.domain.entity;
 
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
+import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
 import com.fhsh.daitda.domain.BaseUserEntity;
+import com.fhsh.daitda.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -25,7 +27,13 @@ import java.util.UUID;
 
 @Entity
 @Getter
-@Table(name = "p_delivery_managers")
+@Table(name = "p_delivery_managers",
+        uniqueConstraints = {
+                @UniqueConstraint(
+                        name = "uk_delivery_manager_user_id",
+                        columnNames = "user_id"
+                )
+        })
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class DeliveryManager extends BaseUserEntity {
 
@@ -55,13 +63,13 @@ public class DeliveryManager extends BaseUserEntity {
     private Long version;
 
     @Builder
-    public DeliveryManager(UUID userId, UUID hubId, String slackId, DeliveryManagerType type, int sequence) {
+    public DeliveryManager(UUID userId, UUID hubId, String slackId, DeliveryManagerType type, int sequence, boolean isDelivery) {
         validate(type, hubId, sequence);
 
         this.managerInfo = ManagerInfo.of(userId, hubId, slackId);
         this.type = type;
         this.sequence = sequence;
-        this.isDelivery = false;
+        this.isDelivery = isDelivery;
     }
 
     // 배송담당자 생성
@@ -73,6 +81,7 @@ public class DeliveryManager extends BaseUserEntity {
                 .slackId(slackId)
                 .type(type)
                 .sequence(sequence)
+                .isDelivery(false)
                 .build();
     }
 
@@ -106,10 +115,10 @@ public class DeliveryManager extends BaseUserEntity {
     // 배송 시작으로 변경
     public void startDelivery() {
         if (this.isDeleted()) {
-            throw new IllegalStateException("삭제된 배송 담당자는 배송을 시작할 수 없습니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELETED_DELIVERY_MANAGER_CANNOT_CHANGE_STATUS);
         }
         if (this.isDelivery) {
-            throw new IllegalStateException("이미 배송 중인 담당자입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_ALREADY_DELIVERING);
         }
         this.isDelivery = true;
     }
@@ -117,10 +126,10 @@ public class DeliveryManager extends BaseUserEntity {
     // 배송 완료로 변경
     public void completeDelivery() {
         if (this.isDeleted()) {
-            throw new IllegalStateException("삭제된 배송 담당자는 배송 상태를 변경할 수 없습니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELETED_DELIVERY_MANAGER_CANNOT_CHANGE_STATUS);
         }
         if (!this.isDelivery) {
-            throw new IllegalStateException("배송 중인 상태가 아닙니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_DELIVERING);
         }
         this.isDelivery = false;
     }
@@ -138,10 +147,10 @@ public class DeliveryManager extends BaseUserEntity {
     // 입력 값 검증
     private void validate(DeliveryManagerType type, UUID hubId, int sequence) {
         if (type == null) {
-            throw new IllegalArgumentException("배송 담당자 타입은 필수입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_TYPE_REQUIRED);
         }
         if (type == DeliveryManagerType.COMPANY && hubId == null) {
-            throw new IllegalArgumentException("업체 배송 담당자는 허브 ID가 필수입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_HUB_ID_REQUIRED);
         }
 
         validateSequence(sequence);
@@ -149,7 +158,7 @@ public class DeliveryManager extends BaseUserEntity {
 
     private static void validateSequence(int sequence) {
         if (sequence < MIN_SEQUENCE || sequence > MAX_SEQUENCE) {
-            throw new IllegalArgumentException("sequence는 1~10 범위여야 합니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_SEQUENCE_INVALID);
         }
     }
 }

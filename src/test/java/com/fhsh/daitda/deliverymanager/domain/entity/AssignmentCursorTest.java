@@ -1,6 +1,8 @@
 package com.fhsh.daitda.deliverymanager.domain.entity;
 
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
+import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
+import com.fhsh.daitda.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -33,8 +35,9 @@ public class AssignmentCursorTest {
         AssignmentCursor cursor = AssignmentCursor.init(DeliveryManagerType.HUB, null);
 
         assertThatThrownBy(() -> cursor.advanceTo(0))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("유효하지 않은 담당자 순번입니다.");
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(DeliveryManagerErrorCode.DELIVERY_MANAGER_SEQUENCE_INVALID);
     }
 
     @Test
@@ -43,15 +46,17 @@ public class AssignmentCursorTest {
         AssignmentCursor cursor = AssignmentCursor.init(DeliveryManagerType.HUB, null);
 
         assertThatThrownBy(() -> cursor.advanceTo(11))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("유효하지 않은 담당자 순번입니다.");
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(DeliveryManagerErrorCode.DELIVERY_MANAGER_SEQUENCE_INVALID);
     }
 
     @Test
     @DisplayName("업체 배송 담당자 커서는 허브 ID가 없으면 예외 발생")
     void init_fail_whenCompanyHubIdIsNull() {
         assertThatThrownBy(() -> AssignmentCursor.init(DeliveryManagerType.COMPANY, null))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("업체 배송 담당자 커서는 허브 ID가 필요합니다.");
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_HUB_ID_REQUIRED);
     }
 }

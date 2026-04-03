@@ -1,9 +1,10 @@
 package com.fhsh.daitda.deliverymanager.domain.entity;
 
+import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
+import com.fhsh.daitda.exception.BusinessException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,12 +15,13 @@ import java.util.UUID;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ManagerInfo {
 
-    @Column(nullable = false)
+    @Column(name = "user_id", nullable = false)
     private UUID userId;
 
+    @Column(name = "hub_id")
     private UUID hubId;
 
-    @Column(length = 100, nullable = false)
+    @Column(name = "slack_id", length = 100, nullable = false)
     private String slackId;
 
     protected ManagerInfo(UUID userId, UUID hubId, String slackId) {
@@ -57,10 +59,10 @@ public class ManagerInfo {
 
     private static void validate(UUID userId, String slackId) {
         if (userId == null) {
-            throw new IllegalArgumentException("userId는 필수입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.USER_ID_REQUIRED);
         }
         if (slackId == null || slackId.isBlank()) {
-            throw new IllegalArgumentException("slackId는 필수입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.SLACK_ID_REQUIRED);
         }
     }
 }

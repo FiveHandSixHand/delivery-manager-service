@@ -1,6 +1,8 @@
 package com.fhsh.daitda.deliverymanager.domain.entity;
 
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
+import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
+import com.fhsh.daitda.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -66,18 +68,18 @@ public class AssignmentCursor {
 
     public void advanceTo(int assignedSequence) {
         if (assignedSequence < MIN_SEQUENCE || assignedSequence > MAX_SEQUENCE) {
-            throw new IllegalArgumentException("유효하지 않은 담당자 순번입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_SEQUENCE_INVALID);
         }
         this.lastAssignedSequence = assignedSequence;
     }
 
     private static void validate(DeliveryManagerType type, UUID hubId) {
         if (type == null) {
-            throw new IllegalArgumentException("담당자 타입은 필수입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_TYPE_REQUIRED);
         }
 
         if (type == DeliveryManagerType.COMPANY && hubId == null) {
-            throw new IllegalArgumentException("업체 배송 담당자 커서는 허브 ID가 필요합니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_HUB_ID_REQUIRED);
         }
     }
 }
