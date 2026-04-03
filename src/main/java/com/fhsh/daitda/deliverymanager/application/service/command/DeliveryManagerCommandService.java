@@ -5,7 +5,9 @@ import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManager
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
+import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
 import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerRepository;
+import com.fhsh.daitda.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,7 +28,7 @@ public class DeliveryManagerCommandService {
         validateUser(userInfo, command);
 
         if (deliveryManagerRepository.existsByUserId(userInfo.userId())) {
-            throw new IllegalArgumentException("이미 등록된 배송담당자입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_ALREADY_EXISTS);
         }
 
         // 배송담당자 순번 지정
@@ -35,7 +37,7 @@ public class DeliveryManagerCommandService {
         int nextSequence = (lastSequence == null) ? 1 : lastSequence + 1;
 
         if (nextSequence > 10) {
-            throw new IllegalArgumentException("배송담당자는 최대 10명까지만 등록할 수 있습니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_LIMIT_EXCEEDED);
         }
 
         // 배송담당자 생성
@@ -52,15 +54,15 @@ public class DeliveryManagerCommandService {
 
     private void validateUser(UserInfoCommand userInfo, CreateDeliveryManagerCommand command) {
         if (userInfo == null) {
-            throw new IllegalArgumentException("대상 사용자를 찾을 수 없습니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.USER_NOT_FOUND);
         }
 
         if (command.type() == DeliveryManagerType.COMPANY && userInfo.hubId() == null) {
-            throw new IllegalArgumentException("업체 배송 담당자는 허브 정보가 필요합니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_HUB_REQUIRED);
         }
 
         if (userInfo.slackUserId() == null || userInfo.slackUserId().isBlank()) {
-            throw new IllegalArgumentException("슬랙 ID가 없는 사용자입니다.");
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_SLACK_ID_REQUIRED);
         }
     }
 }
