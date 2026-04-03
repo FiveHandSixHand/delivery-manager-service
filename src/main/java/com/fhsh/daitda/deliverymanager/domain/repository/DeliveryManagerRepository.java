@@ -13,7 +13,7 @@ public interface DeliveryManagerRepository {
     // 배송담당자 생성 시 중복 생성을 막기 위해 배송담당자로 등록되었는 지 확인
     boolean existsByUserId(UUID userId);
 
-    // 배송담당자 생성 시 다음 순번 반환
+    // 배송담당자 생성 시 현재 마지막 순번 반환
     Integer findLastSequence(DeliveryManagerType type, UUID hubId);
 
     DeliveryManager save(DeliveryManager deliveryManager);
