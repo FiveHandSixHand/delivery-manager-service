@@ -141,7 +141,7 @@ public class DeliveryManagerController {
 
         CompleteCurrentDeliveryCommand command = new CompleteCurrentDeliveryCommand(deliveryId, userId);
         CompleteCurrentDeliveryResult result = commandService.completeCurrentDelivery(command);
-        CompleteCurrentDeliveryResponse response = new CompleteCurrentDeliveryResponse(result.deliveryId());
+        CompleteCurrentDeliveryResponse response = new CompleteCurrentDeliveryResponse(result.deliveryId(), result.isDelivery());
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }
