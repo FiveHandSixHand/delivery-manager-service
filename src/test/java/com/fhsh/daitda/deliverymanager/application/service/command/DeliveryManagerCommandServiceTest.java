@@ -1,6 +1,6 @@
 package com.fhsh.daitda.deliverymanager.application.service.command;
 
-import com.fhsh.daitda.deliverymanager.application.client.UserClient;
+import com.fhsh.daitda.deliverymanager.application.client.UserLookupService;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
@@ -36,7 +36,7 @@ public class DeliveryManagerCommandServiceTest {
     @Mock
     private DeliveryManagerRepository managerRepository;
     @Mock
-    private UserClient userClient;
+    private UserLookupService userLookupService;
 
     @Nested
     @DisplayName("배송담당자 생성")
@@ -55,9 +55,11 @@ public class DeliveryManagerCommandServiceTest {
             // 예시 사용자 정보
             UserInfoCommand userInfo = new UserInfoCommand(targetUserId, hubId, "exampleId");
 
-            given(userClient.getUser(targetUserId)).willReturn(userInfo);
+            given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
             given(managerRepository.existsByUserId(targetUserId)).willReturn(false);
             given(managerRepository.findLastSequence(DeliveryManagerType.COMPANY, hubId)).willReturn(7); // 현재 마지막 순번 7번
+            given(managerRepository.save(any(DeliveryManager.class)))
+                    .willAnswer(invocation -> invocation.getArgument(0));
 
             // when
             managerService.createDeliveryManager(command);
@@ -83,7 +85,7 @@ public class DeliveryManagerCommandServiceTest {
 
             UserInfoCommand userInfo = new UserInfoCommand(targetUserId, hubId, "exampleId");
 
-            given(userClient.getUser(targetUserId)).willReturn(userInfo);
+            given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
             given(managerRepository.existsByUserId(targetUserId)).willReturn(false);
             given(managerRepository.findLastSequence(DeliveryManagerType.COMPANY, hubId)).willReturn(10); // 현재 마지막 순번 10번
 
@@ -110,7 +112,7 @@ public class DeliveryManagerCommandServiceTest {
             UserInfoCommand userInfo =
                     new UserInfoCommand(targetUserId, hubId, "exampleId");
 
-            given(userClient.getUser(targetUserId)).willReturn(userInfo);
+            given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
             // 해당 userId의 배송담당자가 이미 존재하므로 true 반환
             given(managerRepository.existsByUserId(targetUserId)).willReturn(true);
 
@@ -135,7 +137,7 @@ public class DeliveryManagerCommandServiceTest {
             UserInfoCommand userInfo =
                     new UserInfoCommand(targetUserId, null, "exampleId");
 
-            given(userClient.getUser(targetUserId)).willReturn(userInfo);
+            given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
 
             // when & then
             assertThatThrownBy(() -> managerService.createDeliveryManager(command))
