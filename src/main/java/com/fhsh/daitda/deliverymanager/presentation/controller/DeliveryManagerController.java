@@ -21,7 +21,7 @@ public class DeliveryManagerController {
 
     private final DeliveryManagerCommandService service;
 
-    //@PreAuthorize("hasAnyRole('ADMIN', 'HUB')")
+    // 배송담당자 생성
     @PostMapping
     public ResponseEntity<CommonResponse<CreateDeliveryManagerResponse>> createDeliveryManager(
             @RequestHeader(value = "X-User-Role") String role,
@@ -42,6 +42,7 @@ public class DeliveryManagerController {
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 
+    // 배송담당자 삭제
     @DeleteMapping("/{deliveryManagerId}")
     public ResponseEntity<CommonResponse<DeleteDeliveryManagerResponse>> deleteDeliveryManager(
             @RequestHeader(value = "X-User-Id") String userId,
