@@ -17,4 +17,7 @@ public interface DeliveryManagerQueryRepository {
 
     // 목록 조회
     Page<DeliveryManager> findAll(GetDeliveryManagerListQuery query, Pageable pageable);
+
+    // 본인 조회
+    Optional<DeliveryManager> findByUserId(UUID userId);
 }

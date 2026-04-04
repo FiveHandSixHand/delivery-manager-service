@@ -3,19 +3,15 @@ package com.fhsh.daitda.deliverymanager.presentation.controller;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerListQuery;
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerQuery;
-import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.DeleteDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerListResult;
-import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerResult;
+import com.fhsh.daitda.deliverymanager.application.query.GetMyDeliveryManagerQuery;
+import com.fhsh.daitda.deliverymanager.application.result.*;
 import com.fhsh.daitda.deliverymanager.application.service.command.DeliveryManagerCommandService;
 import com.fhsh.daitda.deliverymanager.application.service.query.DeliveryManagerQueryService;
 import com.fhsh.daitda.deliverymanager.presentation.dto.request.CreateDeliveryManagerRequest;
 import com.fhsh.daitda.deliverymanager.presentation.dto.request.GetDeliveryManagerListRequest;
-import com.fhsh.daitda.deliverymanager.presentation.dto.response.CreateDeliveryManagerResponse;
-import com.fhsh.daitda.deliverymanager.presentation.dto.response.DeleteDeliveryManagerResponse;
-import com.fhsh.daitda.deliverymanager.presentation.dto.response.GetDeliveryManagerListResponse;
-import com.fhsh.daitda.deliverymanager.presentation.dto.response.GetDeliveryManagerResponse;
+import com.fhsh.daitda.deliverymanager.presentation.dto.response.*;
 import com.fhsh.daitda.response.CommonResponse;
+import com.thoughtworks.xstream.core.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -106,6 +102,24 @@ public class DeliveryManagerController {
         Page<GetDeliveryManagerListResponse> response = queryService
                 .getDeliveryManagers(query, pageable)
                 .map(GetDeliveryManagerListResponse::from);
+
+        return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
+    // 배송담당자 본인 조회
+    @GetMapping("/me")
+    public ResponseEntity<CommonResponse<GetMyDeliveryManagerResponse>> getMyDeliveryManager(
+            @RequestHeader(value = "X-User-Id") UUID userId,
+            @RequestHeader(value = "X-User-Role") String role
+    ) {
+        if (!"DELIVERY".equals(role)) {
+            // CommonResponse에 fail 추가 후 수정 예정
+            return ResponseEntity.ok(CommonResponse.success("접근 권한이 없습니다.", null));
+        }
+
+        GetMyDeliveryManagerQuery query = new GetMyDeliveryManagerQuery(userId);
+        GetMyDeliveryManagerResult result = queryService.getMyDeliveryManager(query);
+        GetMyDeliveryManagerResponse response = GetMyDeliveryManagerResponse.from(result);
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }

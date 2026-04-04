@@ -2,8 +2,10 @@ package com.fhsh.daitda.deliverymanager.application.service.query;
 
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerListQuery;
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerQuery;
+import com.fhsh.daitda.deliverymanager.application.query.GetMyDeliveryManagerQuery;
 import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerListResult;
 import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerResult;
+import com.fhsh.daitda.deliverymanager.application.result.GetMyDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
 import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerQueryRepository;
 import com.fhsh.daitda.exception.BusinessException;
@@ -31,5 +33,12 @@ public class DeliveryManagerQueryService {
     public Page<GetDeliveryManagerListResult> getDeliveryManagers(GetDeliveryManagerListQuery query, Pageable pageable) {
         return deliveryManagerQueryRepository.findAll(query, pageable)
                 .map(GetDeliveryManagerListResult::from);
+    }
+
+    // 배송담당자 본인 조회
+    public GetMyDeliveryManagerResult getMyDeliveryManager(GetMyDeliveryManagerQuery query) {
+        return deliveryManagerQueryRepository.findByUserId(query.userId())
+                .map(GetMyDeliveryManagerResult::from)
+                .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_FOUND));
     }
 }

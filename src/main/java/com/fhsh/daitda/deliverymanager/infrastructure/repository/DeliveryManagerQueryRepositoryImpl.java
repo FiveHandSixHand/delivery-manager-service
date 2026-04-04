@@ -68,6 +68,19 @@ public class DeliveryManagerQueryRepositoryImpl implements DeliveryManagerQueryR
         return PageableExecutionUtils.getPage(contents, pageable, countQuery::fetchOne);
     }
 
+    @Override
+    public Optional<DeliveryManager> findByUserId(UUID userId) {
+        DeliveryManager result = queryFactory
+                .selectFrom(deliveryManager)
+                .where(
+                        deliveryManager.managerInfo.userId.eq(userId),
+                        isNotDeleted()
+                )
+                .fetchOne();
+
+        return Optional.ofNullable(result);
+    }
+
     // 정렬 조건 확인
     private OrderSpecifier<?>[] getOrderSpecifiers(String sortBy) {
 
