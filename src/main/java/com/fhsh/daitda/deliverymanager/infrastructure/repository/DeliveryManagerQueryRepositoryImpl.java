@@ -86,14 +86,16 @@ public class DeliveryManagerQueryRepositoryImpl implements DeliveryManagerQueryR
         if ("updatedAt".equalsIgnoreCase(sortBy)) {
             return new OrderSpecifier[]{
                     deliveryManager.updatedAt.asc(),
-                    deliveryManager.createdAt.asc()
+                    deliveryManager.createdAt.asc(),
+                    deliveryManager.deliveryManagerId.asc()
             };
         }
 
         // 생성일순, 수정일순 정렬
         return new OrderSpecifier[]{
                 deliveryManager.createdAt.asc(),
-                deliveryManager.updatedAt.asc()
+                deliveryManager.updatedAt.asc(),
+                deliveryManager.deliveryManagerId.asc()
         };
     }
 
