@@ -7,7 +7,6 @@ import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerList
 import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.application.result.GetMyDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
-import com.fhsh.daitda.deliverymanager.domain.entity.ManagerInfo;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerQueryRepository;
 import org.junit.jupiter.api.DisplayName;

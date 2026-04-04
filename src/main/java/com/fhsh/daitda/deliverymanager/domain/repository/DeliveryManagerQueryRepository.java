@@ -2,11 +2,9 @@ package com.fhsh.daitda.deliverymanager.domain.repository;
 
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerListQuery;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
-import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 

@@ -4,11 +4,6 @@ import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import lombok.Builder;
 
-import java.util.List;
-import java.util.UUID;
-
-import lombok.Builder;
-
 import java.util.UUID;
 
 @Builder
