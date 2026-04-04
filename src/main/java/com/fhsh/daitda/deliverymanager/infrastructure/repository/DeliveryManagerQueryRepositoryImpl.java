@@ -1,14 +1,21 @@
 package com.fhsh.daitda.deliverymanager.infrastructure.repository;
 
+import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerListQuery;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerQueryRepository;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -35,32 +42,48 @@ public class DeliveryManagerQueryRepositoryImpl implements DeliveryManagerQueryR
         return Optional.ofNullable(result);
     }
 
-    // 생성일순 목록 조회
     @Override
-    public List<DeliveryManager> findAllByHubIdAndTypeOrderByCreatedAtAsc(UUID hubId, DeliveryManagerType type) {
-        return queryFactory
+    public Page<DeliveryManager> findAll(GetDeliveryManagerListQuery query, Pageable pageable) {
+        List<DeliveryManager> contents = queryFactory
                 .selectFrom(deliveryManager)
                 .where(
                         isNotDeleted(),
-                        eqHubId(hubId),
-                        eqType(type)
+                        eqHubId(query.hubId()),
+                        eqType(query.type())
                 )
-                .orderBy(createdAtAsc(), updatedAtAsc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(getOrderSpecifiers(query.sortBy()))
                 .fetch();
+
+        JPAQuery<Long> countQuery = queryFactory
+                .select(deliveryManager.count())
+                .from(deliveryManager)
+                .where(
+                        isNotDeleted(),
+                        eqHubId(query.hubId()),
+                        eqType(query.type())
+                );
+
+        return PageableExecutionUtils.getPage(contents, pageable, countQuery::fetchOne);
     }
 
-    // 수정일순 목록 조회
-    @Override
-    public List<DeliveryManager> findAllByHubIdAndTypeOrderByUpdatedAtAsc(UUID hubId, DeliveryManagerType type) {
-        return queryFactory
-                .selectFrom(deliveryManager)
-                .where(
-                        isNotDeleted(),
-                        eqHubId(hubId),
-                        eqType(type)
-                )
-                .orderBy(updatedAtAsc(), createdAtAsc())
-                .fetch();
+    // 정렬 조건 확인
+    private OrderSpecifier<?>[] getOrderSpecifiers(String sortBy) {
+
+        // 수정일순, 생성일순 정렬
+        if ("updatedAt".equalsIgnoreCase(sortBy)) {
+            return new OrderSpecifier[]{
+                    deliveryManager.updatedAt.asc(),
+                    deliveryManager.createdAt.asc()
+            };
+        }
+
+        // 생성일순, 수정일순 정렬
+        return new OrderSpecifier[]{
+                deliveryManager.createdAt.asc(),
+                deliveryManager.updatedAt.asc()
+        };
     }
 
     // 삭제 여부
@@ -76,15 +99,5 @@ public class DeliveryManagerQueryRepositoryImpl implements DeliveryManagerQueryR
     // 타입 확인
     private BooleanExpression eqType(DeliveryManagerType type) {
         return type == null ? null : deliveryManager.type.eq(type);
-    }
-
-    // 생성일 오름차순
-    private OrderSpecifier<?> createdAtAsc() {
-        return deliveryManager.createdAt.asc();
-    }
-
-    // 수정일 오름차순
-    private OrderSpecifier<?> updatedAtAsc() {
-        return deliveryManager.updatedAt.asc();
     }
 }
