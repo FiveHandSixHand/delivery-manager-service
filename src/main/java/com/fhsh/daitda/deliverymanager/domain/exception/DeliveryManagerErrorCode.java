@@ -12,6 +12,7 @@ public enum DeliveryManagerErrorCode implements ErrorCode {
     USER_SERVICE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "사용자 서비스 호출에 실패했습니다."),
 
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "대상 사용자를 찾을 수 없습니다."),
+    DELIVERY_MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "대상 배송 담당자를 찾을 수 없습니다."),
 
     USER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "userId는 필수입니다."),
     SLACK_ID_REQUIRED(HttpStatus.BAD_REQUEST, "slackId는 필수입니다."),

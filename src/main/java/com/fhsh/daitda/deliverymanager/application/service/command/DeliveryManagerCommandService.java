@@ -4,6 +4,7 @@ import com.fhsh.daitda.deliverymanager.application.client.UserLookupService;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
 import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
+import com.fhsh.daitda.deliverymanager.application.result.DeleteDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
@@ -12,6 +13,8 @@ import com.fhsh.daitda.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -53,6 +56,15 @@ public class DeliveryManagerCommandService {
         DeliveryManager saved = deliveryManagerRepository.save(deliveryManager);
 
         return new CreateDeliveryManagerResult(saved.getDeliveryManagerId());
+    }
+
+    public DeleteDeliveryManagerResult deleteDeliveryManager(String userId, UUID deliveryManagerId) {
+        DeliveryManager deliveryManager = deliveryManagerRepository.findById(deliveryManagerId)
+                .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_FOUND));
+
+        deliveryManager.delete(userId);
+
+        return new DeleteDeliveryManagerResult(deliveryManager.getDeliveryManagerId());
     }
 
     private void validateUser(UserInfoCommand userInfo, CreateDeliveryManagerCommand command) {

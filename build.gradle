@@ -39,7 +39,7 @@ ext {
 }
 
 dependencies {
-	implementation 'com.fhsh.daitda:common:0.1.2-SNAPSHOT'
+	implementation 'com.fhsh.daitda:common:0.1.3-SNAPSHOT'
 
 	// config server 연결
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
