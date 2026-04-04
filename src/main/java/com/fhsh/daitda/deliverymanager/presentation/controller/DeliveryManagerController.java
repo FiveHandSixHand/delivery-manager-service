@@ -89,6 +89,7 @@ public class DeliveryManagerController {
     public ResponseEntity<CommonResponse<Page<GetDeliveryManagerListResponse>>> getDeliveryManagers(
             @RequestHeader(value = "X-User-Role") String role,
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             @ModelAttribute GetDeliveryManagerListRequest request
     ) {
         if (!hasAdminOrHubRole(role)) {
@@ -96,7 +97,7 @@ public class DeliveryManagerController {
         }
 
         Sort sort = getSort(request.getSortBy());
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         GetDeliveryManagerListQuery query = GetDeliveryManagerListQuery.from(request);
 
