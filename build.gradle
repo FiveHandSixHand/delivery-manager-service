@@ -74,7 +74,7 @@ dependencies {
 	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
 
 	// spring security
-	implementation 'org.springframework.boot:spring-boot-starter-security'
+	//implementation 'org.springframework.boot:spring-boot-starter-security'
 }
 
 dependencyManagement {
