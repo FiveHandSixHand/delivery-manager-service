@@ -20,7 +20,7 @@ public class DeliveryManagerController {
     //@PreAuthorize("hasAnyRole('ADMIN', 'HUB')")
     @PostMapping
     public ResponseEntity<CommonResponse> createDeliveryManager(
-            @RequestHeader(value = "X-User-Role", required = false) String role,
+            @RequestHeader(value = "X-User-Role") String role,
             @RequestBody CreateDeliveryManagerRequest request) {
 
         if (!(role.equals("ADMIN") || role.equals("HUB"))) {
