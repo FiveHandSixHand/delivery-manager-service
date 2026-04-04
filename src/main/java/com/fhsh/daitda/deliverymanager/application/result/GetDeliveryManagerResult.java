@@ -8,7 +8,7 @@ import java.util.UUID;
 
 @Builder
 public record GetDeliveryManagerResult(
-        UUID managerId,
+        UUID deliveryManagerId,
         UUID userId,
         UUID hubId,
         String slackId,
@@ -17,7 +17,7 @@ public record GetDeliveryManagerResult(
 ) {
     public static GetDeliveryManagerResult from(DeliveryManager deliveryManager) {
         return GetDeliveryManagerResult.builder()
-                .managerId(deliveryManager.getDeliveryManagerId())
+                .deliveryManagerId(deliveryManager.getDeliveryManagerId())
                 .userId(deliveryManager.getManagerInfo().getUserId())
                 .hubId(deliveryManager.getManagerInfo().getHubId())
                 .slackId(deliveryManager.getManagerInfo().getSlackId())
