@@ -1,13 +1,11 @@
 package com.fhsh.daitda.deliverymanager.presentation.controller;
 
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
+import com.fhsh.daitda.deliverymanager.application.command.CompleteCurrentDeliveryCommand;
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerListQuery;
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerQuery;
 import com.fhsh.daitda.deliverymanager.application.query.GetMyDeliveryManagerQuery;
-import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.DeleteDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.GetMyDeliveryManagerResult;
+import com.fhsh.daitda.deliverymanager.application.result.*;
 import com.fhsh.daitda.deliverymanager.application.service.command.DeliveryManagerCommandService;
 import com.fhsh.daitda.deliverymanager.application.service.query.DeliveryManagerQueryService;
 import com.fhsh.daitda.deliverymanager.presentation.dto.request.CreateDeliveryManagerRequest;
@@ -124,6 +122,26 @@ public class DeliveryManagerController {
         GetMyDeliveryManagerQuery query = new GetMyDeliveryManagerQuery(userId);
         GetMyDeliveryManagerResult result = queryService.getMyDeliveryManager(query);
         GetMyDeliveryManagerResponse response = GetMyDeliveryManagerResponse.from(result);
+
+        return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
+    // 배송담당자 배송 완료
+    @PatchMapping("/me/deliveries/{deliveryId}/complete")
+    public ResponseEntity<CommonResponse<CompleteCurrentDeliveryResponse>> completeCurrentDelivery(
+            @RequestHeader(value = "X-User-Id") UUID userId,
+            @RequestHeader(value = "X-User-Role") String role,
+            @PathVariable UUID deliveryId
+    ) {
+        if (!"DELIVERY".equals(role)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(CommonResponse.fail(403, "접근 권한이 없습니다.", null));
+        }
+
+        CompleteCurrentDeliveryCommand command = new CompleteCurrentDeliveryCommand(deliveryId, userId);
+        CompleteCurrentDeliveryResult result = commandService.completeCurrentDelivery(command);
+        CompleteCurrentDeliveryResponse response = new CompleteCurrentDeliveryResponse(result.deliveryId());
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }

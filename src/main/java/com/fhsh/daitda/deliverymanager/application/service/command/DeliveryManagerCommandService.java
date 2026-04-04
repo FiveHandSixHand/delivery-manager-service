@@ -1,8 +1,10 @@
 package com.fhsh.daitda.deliverymanager.application.service.command;
 
 import com.fhsh.daitda.deliverymanager.application.client.UserLookupService;
+import com.fhsh.daitda.deliverymanager.application.command.CompleteCurrentDeliveryCommand;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
+import com.fhsh.daitda.deliverymanager.application.result.CompleteCurrentDeliveryResult;
 import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.application.result.DeleteDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
@@ -24,6 +26,7 @@ public class DeliveryManagerCommandService {
     private final DeliveryManagerRepository deliveryManagerRepository;
     private final UserLookupService userLookupService;
 
+    // 배송담당자 생성
     public CreateDeliveryManagerResult createDeliveryManager(CreateDeliveryManagerCommand command) {
         // user-service에서 사용자 정보 받아오기
         UserInfoCommand userInfo = userLookupService.getUser(command.targetUserId());
@@ -58,6 +61,7 @@ public class DeliveryManagerCommandService {
         return new CreateDeliveryManagerResult(saved.getDeliveryManagerId());
     }
 
+    // 배송담당자 삭제
     public DeleteDeliveryManagerResult deleteDeliveryManager(String userId, UUID deliveryManagerId) {
         DeliveryManager deliveryManager = deliveryManagerRepository.findById(deliveryManagerId)
                 .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_FOUND));
@@ -65,6 +69,19 @@ public class DeliveryManagerCommandService {
         deliveryManager.delete(userId);
 
         return new DeleteDeliveryManagerResult(deliveryManager.getDeliveryManagerId());
+    }
+
+    // 배송담당자 배송 완료
+    public CompleteCurrentDeliveryResult completeCurrentDelivery(CompleteCurrentDeliveryCommand command) {
+        DeliveryManager deliveryManager = deliveryManagerRepository.findById(command.deliveryManagerId())
+                .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_FOUND));
+
+        // 배송 완료로 변경
+        deliveryManager.completeDelivery();
+
+        // 배송 완료 메시지 발행 필요
+
+        return new CompleteCurrentDeliveryResult(command.deliveryId(), deliveryManager.isDelivery());
     }
 
     private void validateUser(UserInfoCommand userInfo, CreateDeliveryManagerCommand command) {
