@@ -58,6 +58,8 @@ public class DeliveryManagerCommandServiceTest {
             given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
             given(managerRepository.existsByUserId(targetUserId)).willReturn(false);
             given(managerRepository.findLastSequence(DeliveryManagerType.COMPANY, hubId)).willReturn(7); // 현재 마지막 순번 7번
+            given(managerRepository.save(any(DeliveryManager.class)))
+                    .willAnswer(invocation -> invocation.getArgument(0));
 
             // when
             managerService.createDeliveryManager(command);
