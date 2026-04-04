@@ -2,9 +2,11 @@ package com.fhsh.daitda.deliverymanager.presentation.controller;
 
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerListQuery;
+import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerQuery;
 import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.application.result.DeleteDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerListResult;
+import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.application.service.command.DeliveryManagerCommandService;
 import com.fhsh.daitda.deliverymanager.application.service.query.DeliveryManagerQueryService;
 import com.fhsh.daitda.deliverymanager.presentation.dto.request.CreateDeliveryManagerRequest;
@@ -12,6 +14,7 @@ import com.fhsh.daitda.deliverymanager.presentation.dto.request.GetDeliveryManag
 import com.fhsh.daitda.deliverymanager.presentation.dto.response.CreateDeliveryManagerResponse;
 import com.fhsh.daitda.deliverymanager.presentation.dto.response.DeleteDeliveryManagerResponse;
 import com.fhsh.daitda.deliverymanager.presentation.dto.response.GetDeliveryManagerListResponse;
+import com.fhsh.daitda.deliverymanager.presentation.dto.response.GetDeliveryManagerResponse;
 import com.fhsh.daitda.response.CommonResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -63,6 +66,23 @@ public class DeliveryManagerController {
 
         DeleteDeliveryManagerResult result = commandService.deleteDeliveryManager(userId, deliveryManagerId);
         DeleteDeliveryManagerResponse response = new DeleteDeliveryManagerResponse(result.deliveryManagerId());
+
+        return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
+    // 배송담당자 단건 조회
+    @GetMapping("/{deliveryManagerId}")
+    public ResponseEntity<CommonResponse<GetDeliveryManagerResponse>> getDeliveryManager(
+            @RequestHeader(value = "X-User-Role") String role,
+            @PathVariable UUID deliveryManagerId) {
+
+        if (!hasAdminOrHubRole(role)) {
+            return forbiddenResponse();
+        }
+
+        GetDeliveryManagerQuery query = new GetDeliveryManagerQuery(deliveryManagerId);
+        GetDeliveryManagerResult result = queryService.getDeliveryManager(query);
+        GetDeliveryManagerResponse response = GetDeliveryManagerResponse.from(result);
 
         return ResponseEntity.ok(CommonResponse.success(response));
     }
