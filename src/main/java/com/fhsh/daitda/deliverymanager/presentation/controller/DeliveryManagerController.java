@@ -19,6 +19,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -115,8 +116,9 @@ public class DeliveryManagerController {
             @RequestHeader(value = "X-User-Role") String role
     ) {
         if (!"DELIVERY".equals(role)) {
-            // CommonResponse에 fail 추가 후 수정 예정
-            return ResponseEntity.ok(CommonResponse.success("접근 권한이 없습니다.", null));
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(CommonResponse.fail(403, "접근 권한이 없습니다.", null));
         }
 
         GetMyDeliveryManagerQuery query = new GetMyDeliveryManagerQuery(userId);
@@ -133,11 +135,9 @@ public class DeliveryManagerController {
 
     // 권한 검증 실패 시 응답
     private <T> ResponseEntity<CommonResponse<T>> forbiddenResponse() {
-        // CommonResponse에 fail 추가 후 수정 예정
-        return ResponseEntity.ok(CommonResponse.success("접근 권한이 없습니다.", null));
-//            return ResponseEntity
-//                    .status(HttpStatus.FORBIDDEN)
-//                    .body(CommonResponse.fail(403, "접근 권한이 없습니다."));
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
+                .body(CommonResponse.fail(403, "접근 권한이 없습니다.", null));
     }
 
     // 생성일/수정일 순 정렬
