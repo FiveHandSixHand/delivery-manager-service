@@ -23,9 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/delivery-managers")
-@RestController
 public class DeliveryManagerController {
 
     private final DeliveryManagerCommandService commandService;

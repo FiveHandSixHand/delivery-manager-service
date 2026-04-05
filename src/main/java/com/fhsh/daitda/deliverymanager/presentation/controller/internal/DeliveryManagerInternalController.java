@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/internal/v1/delivery-managers")
 public class DeliveryManagerInternalController {
 
-    private static DeliveryManagerCommandService commandService;
+    private final DeliveryManagerCommandService commandService;
 
     @PostMapping("/assignments")
     public ResponseEntity<CommonResponse<CompleteAssignmentResponse>> getUserById(
