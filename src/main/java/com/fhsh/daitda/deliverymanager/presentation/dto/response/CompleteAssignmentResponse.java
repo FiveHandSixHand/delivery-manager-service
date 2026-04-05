@@ -1,7 +1,6 @@
 package com.fhsh.daitda.deliverymanager.presentation.dto.response;
 
 import com.fhsh.daitda.deliverymanager.application.result.CompleteAssignmentResult;
-import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import lombok.Builder;
 
@@ -9,6 +8,7 @@ import java.util.UUID;
 
 @Builder
 public record CompleteAssignmentResponse(
+        UUID deliveryId,
         UUID deliveryManagerId,
         UUID userId,
         UUID hubId,
@@ -18,6 +18,7 @@ public record CompleteAssignmentResponse(
 ) {
     public static CompleteAssignmentResponse from(CompleteAssignmentResult result) {
         return CompleteAssignmentResponse.builder()
+                .deliveryId(result.deliveryId())
                 .deliveryManagerId(result.deliveryManagerId())
                 .userId(result.userId())
                 .hubId(result.hubId())

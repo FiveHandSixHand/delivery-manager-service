@@ -9,6 +9,7 @@ import java.util.UUID;
 
 @Builder
 public record CompleteAssignmentResult(
+        UUID deliveryId,
         UUID deliveryManagerId,
         UUID userId,
         UUID hubId,
@@ -16,10 +17,11 @@ public record CompleteAssignmentResult(
         DeliveryManagerType type,
         int sequence
 ) {
-    public static CompleteAssignmentResult from(DeliveryManager deliveryManager) {
+    public static CompleteAssignmentResult from(DeliveryManager deliveryManager, UUID deliveryId) {
         ManagerInfo managerInfo = deliveryManager.getManagerInfo();
 
         return CompleteAssignmentResult.builder()
+                .deliveryId(deliveryId)
                 .deliveryManagerId(deliveryManager.getDeliveryManagerId())
                 .userId(managerInfo != null ? managerInfo.getUserId() : null)
                 .hubId(managerInfo != null ? managerInfo.getHubId() : null)

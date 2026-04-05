@@ -112,7 +112,7 @@ public class DeliveryManagerCommandService {
         // 커서 갱신
         cursor.advanceTo(deliveryManager.getSequence());
 
-        return CompleteAssignmentResult.from(deliveryManager);
+        return CompleteAssignmentResult.from(deliveryManager, command.deliveryId());
     }
 
     private void validateUser(UserInfoCommand userInfo, CreateDeliveryManagerCommand command) {
