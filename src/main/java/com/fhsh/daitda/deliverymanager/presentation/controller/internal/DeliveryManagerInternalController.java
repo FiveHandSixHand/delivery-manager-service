@@ -19,7 +19,7 @@ public class DeliveryManagerInternalController {
     private final DeliveryManagerCommandService commandService;
 
     @PostMapping("/assignments")
-    public ResponseEntity<CommonResponse<CompleteAssignmentResponse>> getUserById(
+    public ResponseEntity<CommonResponse<CompleteAssignmentResponse>> completeAssignment(
             @RequestHeader(value = "X-User-Role") String role,
             @RequestBody CompleteAssignmentRequest request
     ) {
