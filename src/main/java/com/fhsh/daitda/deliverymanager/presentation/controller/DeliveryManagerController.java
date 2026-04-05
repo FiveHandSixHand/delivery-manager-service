@@ -149,7 +149,7 @@ public class DeliveryManagerController {
 
     // 권한 체크
     private boolean hasAdminOrHubRole(String role) {
-        return "ADMIN".equals(role) || "HUB".equals(role);
+        return "ADMIN".equals(role) || "HUB_ADMIN".equals(role);
     }
 
     // 권한 검증 실패 시 응답

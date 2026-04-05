@@ -24,7 +24,7 @@ public class DeliveryManagerInternalController {
             @RequestBody CompleteAssignmentRequest request
     ) {
 
-        if (!("ADMIN".equals(role) || "HUB".equals(role))) {
+        if (!("ADMIN".equals(role) || "HUB_ADMIN".equals(role))) {
             return ResponseEntity
                     .status(HttpStatus.FORBIDDEN)
                     .body(CommonResponse.fail(403, "접근 권한이 없습니다.", null));
