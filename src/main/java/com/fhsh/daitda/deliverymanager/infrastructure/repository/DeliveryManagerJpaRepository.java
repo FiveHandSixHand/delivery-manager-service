@@ -11,6 +11,8 @@ public interface DeliveryManagerJpaRepository extends JpaRepository<DeliveryMana
 
     Optional<DeliveryManager> findByDeliveryManagerIdAndDeletedAtIsNull(UUID deliveryManagerId);
 
+    Optional<DeliveryManager> findByManagerInfoUserIdAndDeletedAtIsNull(UUID userId);
+
     boolean existsByManagerInfo_UserIdAndDeletedAtIsNull(UUID userId);
 
     Optional<DeliveryManager> findFirstByTypeAndManagerInfo_HubIdAndDeletedAtIsNullOrderBySequenceDesc(

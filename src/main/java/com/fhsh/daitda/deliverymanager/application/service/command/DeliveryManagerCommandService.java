@@ -80,7 +80,7 @@ public class DeliveryManagerCommandService {
 
     // 배송담당자 배송 완료
     public CompleteCurrentDeliveryResult completeCurrentDelivery(CompleteCurrentDeliveryCommand command) {
-        DeliveryManager deliveryManager = deliveryManagerRepository.findById(command.userId())
+        DeliveryManager deliveryManager = deliveryManagerRepository.findByUserId(command.userId())
                 .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.USER_NOT_FOUND));
 
         // 배송 완료로 변경
