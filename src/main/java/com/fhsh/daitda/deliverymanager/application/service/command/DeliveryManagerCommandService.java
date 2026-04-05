@@ -1,15 +1,20 @@
 package com.fhsh.daitda.deliverymanager.application.service.command;
 
 import com.fhsh.daitda.deliverymanager.application.client.UserLookupService;
+import com.fhsh.daitda.deliverymanager.application.command.CompleteAssignmentCommand;
 import com.fhsh.daitda.deliverymanager.application.command.CompleteCurrentDeliveryCommand;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
+import com.fhsh.daitda.deliverymanager.application.result.CompleteAssignmentResult;
 import com.fhsh.daitda.deliverymanager.application.result.CompleteCurrentDeliveryResult;
 import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
 import com.fhsh.daitda.deliverymanager.application.result.DeleteDeliveryManagerResult;
+import com.fhsh.daitda.deliverymanager.domain.entity.AssignmentCursor;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
+import com.fhsh.daitda.deliverymanager.domain.repository.AssignmentCursorRepository;
+import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerAssignmentRepository;
 import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerRepository;
 import com.fhsh.daitda.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
@@ -25,6 +30,8 @@ public class DeliveryManagerCommandService {
 
     private final DeliveryManagerRepository deliveryManagerRepository;
     private final UserLookupService userLookupService;
+    private final DeliveryManagerAssignmentRepository deliveryManagerAssignmentRepository;
+    private final AssignmentCursorRepository assignmentCursorRepository;
 
     // 배송담당자 생성
     public CreateDeliveryManagerResult createDeliveryManager(CreateDeliveryManagerCommand command) {
@@ -82,6 +89,30 @@ public class DeliveryManagerCommandService {
         // 배송 완료 메시지 발행 필요
 
         return new CompleteCurrentDeliveryResult(command.deliveryId(), deliveryManager.isDelivery());
+    }
+
+    // 배송담당자 배정
+    public CompleteAssignmentResult completeAssignment(CompleteAssignmentCommand command) {
+        DeliveryManagerType type =
+                (command.hubId() == null) ? DeliveryManagerType.HUB : DeliveryManagerType.COMPANY;
+
+        // 지정된 타입과 허브에 맞는 커서 찾기
+        // 커서가 없다면 생성/저장하여 반환
+        AssignmentCursor cursor = assignmentCursorRepository.findByTypeAndHubId(type, command.hubId())
+                .orElseGet(() -> assignmentCursorRepository.save(AssignmentCursor.init(type, command.hubId())));
+
+        // 배정을 시작해야하는 시작 위치 받아오기
+        int startSequence = cursor.nextStartSequence();
+
+        // 지정된 타입과 허브에서 시작 위치부터 배정 순번 받아오기
+        DeliveryManager deliveryManager = deliveryManagerAssignmentRepository
+                .findNextAssignable(type, command.hubId(), startSequence)
+                .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.NO_AVAILABLE_DELIVERY_MANAGER));
+
+        // 커서 갱신
+        cursor.advanceTo(deliveryManager.getSequence());
+
+        return CompleteAssignmentResult.from(deliveryManager);
     }
 
     private void validateUser(UserInfoCommand userInfo, CreateDeliveryManagerCommand command) {

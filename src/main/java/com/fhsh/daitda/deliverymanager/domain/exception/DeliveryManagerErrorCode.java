@@ -24,6 +24,7 @@ public enum DeliveryManagerErrorCode implements ErrorCode {
     DELIVERY_MANAGER_ALREADY_DELIVERING(HttpStatus.BAD_REQUEST, "이미 배송 중인 담당자입니다."),
     DELETED_DELIVERY_MANAGER_CANNOT_CHANGE_STATUS(HttpStatus.BAD_REQUEST, "삭제된 배송 담당자는 배송 상태를 변경할 수 없습니다."),
     DELIVERY_MANAGER_NOT_DELIVERING(HttpStatus.BAD_REQUEST, "배송 중인 상태가 아닙니다."),
+    NO_AVAILABLE_DELIVERY_MANAGER(HttpStatus.BAD_REQUEST, "현재 배정 가능한 배송담당자가 없습니다."),
 
     DELIVERY_MANAGER_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 등록된 배송담당자입니다.");
 

@@ -30,23 +30,24 @@ public class DeliveryManagerAssignmentRepositoryImpl implements DeliveryManagerA
                         typeEq(type),
                         hubIdEq(type, hubId),
                         notDeleted(),
-                        notDelivering(),
-                        sequenceFrom(startSequence)
+                        sequenceBetween(startSequence, 10)
                 )
                 .orderBy(deliveryManager.sequence.asc())
                 .fetchFirst();
 
+        // 시작 번호 ~ 10번 중 찾은 경우
         if (candidate != null) {
             return Optional.of(candidate);
         }
 
+        // 1번 ~ 시작 번호 전 중 찾도록 다시 순회
         DeliveryManager wrappedCandidate = queryFactory
                 .selectFrom(deliveryManager)
                 .where(
                         typeEq(type),
                         hubIdEq(type, hubId),
                         notDeleted(),
-                        notDelivering()
+                        sequenceBetween(1, startSequence - 1)
                 )
                 .orderBy(deliveryManager.sequence.asc())
                 .fetchFirst();
@@ -69,11 +70,7 @@ public class DeliveryManagerAssignmentRepositoryImpl implements DeliveryManagerA
         return deliveryManager.deletedAt.isNull();
     }
 
-    private BooleanExpression notDelivering() {
-        return deliveryManager.isDelivery.isFalse();
-    }
-
-    private BooleanExpression sequenceFrom(int startSequence) {
-        return deliveryManager.sequence.goe(startSequence);
+    private BooleanExpression sequenceBetween(int start, int end) {
+        return deliveryManager.sequence.between(start, end);
     }
 }
