@@ -1,13 +1,18 @@
 package com.fhsh.daitda.deliverymanager.application.service.command;
 
 import com.fhsh.daitda.deliverymanager.application.client.UserLookupService;
+import com.fhsh.daitda.deliverymanager.application.command.CompleteAssignmentCommand;
 import com.fhsh.daitda.deliverymanager.application.command.CompleteCurrentDeliveryCommand;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
+import com.fhsh.daitda.deliverymanager.application.result.CompleteAssignmentResult;
 import com.fhsh.daitda.deliverymanager.application.result.CompleteCurrentDeliveryResult;
+import com.fhsh.daitda.deliverymanager.domain.entity.AssignmentCursor;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
 import com.fhsh.daitda.deliverymanager.domain.exception.DeliveryManagerErrorCode;
+import com.fhsh.daitda.deliverymanager.domain.repository.AssignmentCursorRepository;
+import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerAssignmentRepository;
 import com.fhsh.daitda.deliverymanager.domain.repository.DeliveryManagerRepository;
 import com.fhsh.daitda.exception.BusinessException;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +30,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
@@ -38,10 +44,15 @@ public class DeliveryManagerCommandServiceTest {
     @InjectMocks
     private DeliveryManagerCommandService commandService;
 
+
+    @Mock
+    private UserLookupService userLookupService;
     @Mock
     private DeliveryManagerRepository repository;
     @Mock
-    private UserLookupService userLookupService;
+    private DeliveryManagerAssignmentRepository assignmentRepository;
+    @Mock
+    private AssignmentCursorRepository cursorRepository;
 
     @Nested
     @DisplayName("배송담당자 생성")
@@ -218,6 +229,88 @@ public class DeliveryManagerCommandServiceTest {
                     .hasMessage(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_DELIVERING.getDescription());
 
             then(repository).should().findById(deliveryManagerId);
+        }
+    }
+
+    @Nested
+    @DisplayName("배송담당자 배정")
+    class AssignmentDeliveryManager {
+        @Test
+        @DisplayName("성공 케이스 - 다음 담당자 배정, 커서 갱신")
+        void completeAssignment_success_withExistingCursor() {
+            // given
+            UUID deliveryId = UUID.randomUUID();
+            UUID hubId = UUID.randomUUID();
+
+            CompleteAssignmentCommand command = new CompleteAssignmentCommand(deliveryId, hubId);
+
+            AssignmentCursor cursor = AssignmentCursor.init(DeliveryManagerType.COMPANY, hubId);
+            cursor.advanceTo(3); // 다음 시작 순번은 4
+
+            // 배정 받을 4번 배송담당자 생성
+            DeliveryManager deliveryManager = DeliveryManager.create(
+                    UUID.randomUUID(),
+                    hubId,
+                    "exampleId",
+                    DeliveryManagerType.COMPANY,
+                    4
+            );
+
+            given(cursorRepository.findByTypeAndHubId(DeliveryManagerType.COMPANY, hubId))
+                    .willReturn(Optional.of(cursor));
+
+            given(assignmentRepository.findNextAssignable(DeliveryManagerType.COMPANY, hubId, 4))
+                    .willReturn(Optional.of(deliveryManager));
+
+            // when
+            CompleteAssignmentResult result = commandService.completeAssignment(command);
+
+            // then
+            assertThat(result.deliveryManagerId()).isEqualTo(deliveryManager.getDeliveryManagerId());
+            assertThat(cursor.getLastAssignedSequence()).isEqualTo(4);
+
+            then(cursorRepository).should().findByTypeAndHubId(DeliveryManagerType.COMPANY, hubId);
+            then(cursorRepository).should(never()).save(any(AssignmentCursor.class));
+            then(assignmentRepository).should().findNextAssignable(DeliveryManagerType.COMPANY, hubId, 4);
+        }
+
+        @Test
+        @DisplayName("성공 케이스 - 커서가 없으면 새 커서 생성, 첫 담당자 배정")
+        void completeAssignment_success_withNewCursor() {
+            // given
+            UUID deliveryId = UUID.randomUUID();
+
+            CompleteAssignmentCommand command = new CompleteAssignmentCommand(deliveryId, null);
+
+            AssignmentCursor newCursor = AssignmentCursor.init(DeliveryManagerType.HUB, null);
+
+            DeliveryManager deliveryManager = DeliveryManager.create(
+                    UUID.randomUUID(),
+                    null,
+                    "exampleId",
+                    DeliveryManagerType.HUB,
+                    1
+            );
+
+            given(cursorRepository.findByTypeAndHubId(DeliveryManagerType.HUB, null))
+                    .willReturn(Optional.empty());
+
+            given(cursorRepository.save(any(AssignmentCursor.class)))
+                    .willReturn(newCursor);
+
+            given(assignmentRepository.findNextAssignable(DeliveryManagerType.HUB, null, 1))
+                    .willReturn(Optional.of(deliveryManager));
+
+            // when
+            CompleteAssignmentResult result = commandService.completeAssignment(command);
+
+            // then
+            assertThat(result.deliveryManagerId()).isEqualTo(deliveryManager.getDeliveryManagerId());
+            assertThat(newCursor.getLastAssignedSequence()).isEqualTo(1);
+
+            then(cursorRepository).should().findByTypeAndHubId(DeliveryManagerType.HUB, null);
+            then(cursorRepository).should().save(any(AssignmentCursor.class)); // 새 커서 만들어서 저장
+            then(assignmentRepository).should().findNextAssignable(DeliveryManagerType.HUB, null, 1);
         }
     }
 
