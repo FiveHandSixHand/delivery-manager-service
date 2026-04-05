@@ -1,13 +1,11 @@
 package com.fhsh.daitda.deliverymanager.presentation.controller;
 
+import com.fhsh.daitda.deliverymanager.application.command.CompleteCurrentDeliveryCommand;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerListQuery;
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerQuery;
 import com.fhsh.daitda.deliverymanager.application.query.GetMyDeliveryManagerQuery;
-import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.DeleteDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.GetDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.GetMyDeliveryManagerResult;
+import com.fhsh.daitda.deliverymanager.application.result.*;
 import com.fhsh.daitda.deliverymanager.application.service.command.DeliveryManagerCommandService;
 import com.fhsh.daitda.deliverymanager.application.service.query.DeliveryManagerQueryService;
 import com.fhsh.daitda.deliverymanager.presentation.dto.request.CreateDeliveryManagerRequest;
@@ -25,9 +23,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/delivery-managers")
-@RestController
 public class DeliveryManagerController {
 
     private final DeliveryManagerCommandService commandService;
@@ -55,7 +53,7 @@ public class DeliveryManagerController {
     // 배송담당자 삭제
     @DeleteMapping("/{deliveryManagerId}")
     public ResponseEntity<CommonResponse<DeleteDeliveryManagerResponse>> deleteDeliveryManager(
-            @RequestHeader(value = "X-User-Id") String userId,
+            @RequestHeader(value = "X-User-Id") UUID userId,
             @RequestHeader(value = "X-User-Role") String role,
             @PathVariable UUID deliveryManagerId) {
 
@@ -91,6 +89,7 @@ public class DeliveryManagerController {
     public ResponseEntity<CommonResponse<Page<GetDeliveryManagerListResponse>>> getDeliveryManagers(
             @RequestHeader(value = "X-User-Role") String role,
             @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
             @ModelAttribute GetDeliveryManagerListRequest request
     ) {
         if (!hasAdminOrHubRole(role)) {
@@ -98,7 +97,7 @@ public class DeliveryManagerController {
         }
 
         Sort sort = getSort(request.getSortBy());
-        Pageable pageable = PageRequest.of(page, 10, sort);
+        Pageable pageable = PageRequest.of(page, size, sort);
 
         GetDeliveryManagerListQuery query = GetDeliveryManagerListQuery.from(request);
 
@@ -128,9 +127,29 @@ public class DeliveryManagerController {
         return ResponseEntity.ok(CommonResponse.success(response));
     }
 
+    // 배송담당자 배송 완료
+    @PatchMapping("/me/deliveries/{deliveryId}/complete")
+    public ResponseEntity<CommonResponse<CompleteCurrentDeliveryResponse>> completeCurrentDelivery(
+            @RequestHeader(value = "X-User-Id") UUID userId,
+            @RequestHeader(value = "X-User-Role") String role,
+            @PathVariable UUID deliveryId
+    ) {
+        if (!"DELIVERY".equals(role)) {
+            return ResponseEntity
+                    .status(HttpStatus.FORBIDDEN)
+                    .body(CommonResponse.fail(403, "접근 권한이 없습니다.", null));
+        }
+
+        CompleteCurrentDeliveryCommand command = new CompleteCurrentDeliveryCommand(deliveryId, userId);
+        CompleteCurrentDeliveryResult result = commandService.completeCurrentDelivery(command);
+        CompleteCurrentDeliveryResponse response = new CompleteCurrentDeliveryResponse(result.deliveryId(), result.isDelivery());
+
+        return ResponseEntity.ok(CommonResponse.success(response));
+    }
+
     // 권한 체크
     private boolean hasAdminOrHubRole(String role) {
-        return "ADMIN".equals(role) || "HUB".equals(role);
+        return "ADMIN".equals(role) || "HUB_ADMIN".equals(role);
     }
 
     // 권한 검증 실패 시 응답

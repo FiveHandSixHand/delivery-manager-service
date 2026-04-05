@@ -103,7 +103,7 @@ public class DeliveryManager extends BaseUserEntity {
     }
 
     // 배송담당자 삭제
-    public void delete(String deletedBy) {
+    public void delete(UUID deletedBy) {
         super.delete(deletedBy);
     }
 

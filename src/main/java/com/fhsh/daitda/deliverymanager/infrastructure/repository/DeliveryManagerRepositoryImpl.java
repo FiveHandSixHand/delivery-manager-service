@@ -21,6 +21,11 @@ public class DeliveryManagerRepositoryImpl implements DeliveryManagerRepository 
     }
 
     @Override
+    public Optional<DeliveryManager> findByUserId(UUID userId) {
+        return deliveryManagerJpaRepository.findByManagerInfoUserIdAndDeletedAtIsNull(userId);
+    }
+
+    @Override
     public boolean existsByUserId(UUID userId) {
         return deliveryManagerJpaRepository.existsByManagerInfo_UserIdAndDeletedAtIsNull(userId);
     }
