@@ -4,5 +4,5 @@ import java.util.UUID;
 
 public record CompleteCurrentDeliveryCommand(
         UUID deliveryId,
-        UUID deliveryManagerId
+        UUID userId
 ) { }
