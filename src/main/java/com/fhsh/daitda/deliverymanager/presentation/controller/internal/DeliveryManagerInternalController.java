@@ -7,9 +7,11 @@ import com.fhsh.daitda.deliverymanager.presentation.dto.request.CompleteAssignme
 import com.fhsh.daitda.deliverymanager.presentation.dto.response.CompleteAssignmentResponse;
 import com.fhsh.daitda.response.CommonResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
@@ -20,16 +22,8 @@ public class DeliveryManagerInternalController {
 
     @PostMapping("/assignments")
     public ResponseEntity<CommonResponse<CompleteAssignmentResponse>> completeAssignment(
-            @RequestHeader(value = "X-User-Role") String role,
             @RequestBody CompleteAssignmentRequest request
     ) {
-
-        if (!("ADMIN".equals(role) || "HUB_ADMIN".equals(role))) {
-            return ResponseEntity
-                    .status(HttpStatus.FORBIDDEN)
-                    .body(CommonResponse.fail(403, "접근 권한이 없습니다.", null));
-        }
-
 
         CompleteAssignmentCommand command = new CompleteAssignmentCommand(request.deliveryId(), request.hubId());
         CompleteAssignmentResult result = commandService.completeAssignment(command);
