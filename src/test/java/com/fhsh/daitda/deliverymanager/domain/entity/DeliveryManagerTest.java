@@ -18,7 +18,7 @@ public class DeliveryManagerTest {
     void create() {
         UUID userId = UUID.randomUUID();
         UUID hubId = UUID.randomUUID();
-        String slackId = "slack-123";
+        String slackId = "exampleId";
 
         DeliveryManager manager = DeliveryManager.create(
                 userId, hubId, slackId, DeliveryManagerType.COMPANY, 3
@@ -41,7 +41,7 @@ public class DeliveryManagerTest {
                 DeliveryManager.create(
                         UUID.randomUUID(),
                         null,
-                        "slack-123",
+                        "exampleId",
                         DeliveryManagerType.COMPANY,
                         1
                 )
@@ -56,7 +56,7 @@ public class DeliveryManagerTest {
         DeliveryManager manager = DeliveryManager.create(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
-                "slack-123",
+                "exampleId",
                 DeliveryManagerType.HUB,
                 1
         );
@@ -73,7 +73,7 @@ public class DeliveryManagerTest {
         DeliveryManager manager = DeliveryManager.create(
                 UUID.randomUUID(),
                 UUID.randomUUID(),
-                "slack-123",
+                "exampleId",
                 DeliveryManagerType.HUB,
                 1
         );
