@@ -53,7 +53,7 @@ public class DeliveryManagerController {
     // 배송담당자 삭제
     @DeleteMapping("/{deliveryManagerId}")
     public ResponseEntity<CommonResponse<DeleteDeliveryManagerResponse>> deleteDeliveryManager(
-            @RequestHeader(value = "X-User-Id") String userId,
+            @RequestHeader(value = "X-User-Id") UUID userId,
             @RequestHeader(value = "X-User-Role") String role,
             @PathVariable UUID deliveryManagerId) {
 

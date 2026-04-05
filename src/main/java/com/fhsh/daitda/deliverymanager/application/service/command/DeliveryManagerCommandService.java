@@ -69,7 +69,7 @@ public class DeliveryManagerCommandService {
     }
 
     // 배송담당자 삭제
-    public DeleteDeliveryManagerResult deleteDeliveryManager(String userId, UUID deliveryManagerId) {
+    public DeleteDeliveryManagerResult deleteDeliveryManager(UUID userId, UUID deliveryManagerId) {
         DeliveryManager deliveryManager = deliveryManagerRepository.findById(deliveryManagerId)
                 .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_FOUND));
 
