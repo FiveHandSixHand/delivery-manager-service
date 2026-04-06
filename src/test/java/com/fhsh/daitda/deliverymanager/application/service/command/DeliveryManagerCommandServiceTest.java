@@ -172,11 +172,12 @@ public class DeliveryManagerCommandServiceTest {
         @DisplayName("성공 케이스 - 배송 완료 성공")
         void completeCurrentDelivery_success() {
             // given
-            UUID deliveryManagerId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
             UUID deliveryId = UUID.randomUUID();
 
             DeliveryManager deliveryManager = new DeliveryManager(
-                    UUID.randomUUID(),
+                    deliveryId,
+                    userId,
                     UUID.randomUUID(),
                     "exampleId",
                     DeliveryManagerType.HUB,
@@ -184,9 +185,9 @@ public class DeliveryManagerCommandServiceTest {
                     true
             );
 
-            CompleteCurrentDeliveryCommand command = new CompleteCurrentDeliveryCommand(deliveryId, deliveryManagerId);
+            CompleteCurrentDeliveryCommand command = new CompleteCurrentDeliveryCommand(deliveryId, userId);
 
-            given(repository.findById(deliveryManagerId)).willReturn(Optional.of(deliveryManager));
+            given(repository.findByUserId(userId)).willReturn(Optional.of(deliveryManager));
 
             // when
             CompleteCurrentDeliveryResult result = commandService.completeCurrentDelivery(command);
@@ -196,18 +197,19 @@ public class DeliveryManagerCommandServiceTest {
             assertThat(result.isDelivery()).isFalse();
             assertThat(deliveryManager.isDelivery()).isFalse();
 
-            then(repository).should().findById(deliveryManagerId);
+            then(repository).should().findByUserId(userId);
         }
 
         @Test
         @DisplayName("실패 케이스 - 배송중이 아닌 배송담당자가 요청하면 예외 발생")
         void completeCurrentDelivery_fail_notDelivering() {
             // given
-            UUID deliveryManagerId = UUID.randomUUID();
+            UUID userId = UUID.randomUUID();
             UUID deliveryId = UUID.randomUUID();
 
             DeliveryManager deliveryManager = new DeliveryManager(
-                    UUID.randomUUID(),
+                    null,
+                    userId,
                     UUID.randomUUID(),
                     "exampleId",
                     DeliveryManagerType.HUB,
@@ -215,9 +217,9 @@ public class DeliveryManagerCommandServiceTest {
                     false
             );
 
-            CompleteCurrentDeliveryCommand command = new CompleteCurrentDeliveryCommand(deliveryId, deliveryManagerId);
+            CompleteCurrentDeliveryCommand command = new CompleteCurrentDeliveryCommand(deliveryId, userId);
 
-            given(repository.findById(deliveryManagerId)).willReturn(Optional.of(deliveryManager));
+            given(repository.findByUserId(userId)).willReturn(Optional.of(deliveryManager));
 
             // when
             Throwable thrown = catchThrowable(() -> commandService.completeCurrentDelivery(command));
@@ -227,7 +229,7 @@ public class DeliveryManagerCommandServiceTest {
                     .isInstanceOf(BusinessException.class)
                     .hasMessage(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_DELIVERING.getDescription());
 
-            then(repository).should().findById(deliveryManagerId);
+            then(repository).should().findByUserId(userId);
         }
     }
 

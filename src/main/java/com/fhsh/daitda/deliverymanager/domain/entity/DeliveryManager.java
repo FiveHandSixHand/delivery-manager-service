@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /*
@@ -46,6 +47,8 @@ public class DeliveryManager extends BaseUserEntity {
     @Column(nullable = false)
     private UUID deliveryManagerId;
 
+    private UUID deliveryId;
+
     @Embedded
     private ManagerInfo managerInfo;
 
@@ -63,9 +66,10 @@ public class DeliveryManager extends BaseUserEntity {
     private Long version;
 
     @Builder
-    public DeliveryManager(UUID userId, UUID hubId, String slackId, DeliveryManagerType type, int sequence, boolean isDelivery) {
+    public DeliveryManager(UUID deliveryId, UUID userId, UUID hubId, String slackId, DeliveryManagerType type, int sequence, boolean isDelivery) {
         validate(type, hubId, sequence);
 
+        this.deliveryId = deliveryId;
         this.managerInfo = ManagerInfo.of(userId, hubId, slackId);
         this.type = type;
         this.sequence = sequence;
@@ -76,6 +80,7 @@ public class DeliveryManager extends BaseUserEntity {
     public static DeliveryManager create(UUID userId, UUID hubId, String slackId,
                                          DeliveryManagerType type, int sequence) {
         return DeliveryManager.builder()
+                .deliveryId(null)
                 .userId(userId)
                 .hubId(hubId)
                 .slackId(slackId)
@@ -113,24 +118,30 @@ public class DeliveryManager extends BaseUserEntity {
     }
 
     // 배송 시작으로 변경
-    public void startDelivery() {
+    public void startDelivery(UUID deliveryId) {
         if (this.isDeleted()) {
             throw new BusinessException(DeliveryManagerErrorCode.DELETED_DELIVERY_MANAGER_CANNOT_CHANGE_STATUS);
         }
         if (this.isDelivery) {
             throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_ALREADY_DELIVERING);
         }
+        this.deliveryId = deliveryId;
         this.isDelivery = true;
     }
 
     // 배송 완료로 변경
-    public void completeDelivery() {
+    public void completeDelivery(UUID deliveryId) {
         if (this.isDeleted()) {
             throw new BusinessException(DeliveryManagerErrorCode.DELETED_DELIVERY_MANAGER_CANNOT_CHANGE_STATUS);
         }
         if (!this.isDelivery) {
             throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_DELIVERING);
         }
+        if (!Objects.equals(this.deliveryId, deliveryId)) {
+            throw new BusinessException(DeliveryManagerErrorCode.NOT_CURRENT_DELIVERY);
+        }
+
+        this.deliveryId = null;
         this.isDelivery = false;
     }
 

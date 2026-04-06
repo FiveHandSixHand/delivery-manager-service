@@ -61,7 +61,7 @@ public class DeliveryManagerTest {
                 1
         );
 
-        manager.startDelivery();
+        manager.startDelivery(UUID.randomUUID());
 
         assertThat(manager.isDelivering()).isTrue();
         assertThat(manager.isAssignable()).isFalse();
@@ -77,9 +77,11 @@ public class DeliveryManagerTest {
                 DeliveryManagerType.HUB,
                 1
         );
-        manager.startDelivery();
+        UUID deliveryId = UUID.randomUUID();
 
-        manager.completeDelivery();
+        manager.startDelivery(deliveryId);
+
+        manager.completeDelivery(deliveryId);
 
         assertThat(manager.isDelivering()).isFalse();
         assertThat(manager.isAssignable()).isTrue();
