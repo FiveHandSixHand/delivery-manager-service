@@ -125,6 +125,9 @@ public class DeliveryManager extends BaseUserEntity {
         if (this.isDelivery) {
             throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_ALREADY_DELIVERING);
         }
+        if (deliveryId == null) {
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_ID_REQUIRED);
+        }
         this.deliveryId = deliveryId;
         this.isDelivery = true;
     }
