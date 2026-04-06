@@ -24,6 +24,6 @@ public class UserAdapter implements UserClient {
             return null;
         }
 
-        return new UserInfoCommand(response.userId(), response.hubId(), response.slackUserId());
+        return new UserInfoCommand(response.userId(), response.hubId(), response.slackUserId(), response.role());
     }
 }
