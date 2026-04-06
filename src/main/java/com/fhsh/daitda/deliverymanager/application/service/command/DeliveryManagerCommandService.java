@@ -84,7 +84,7 @@ public class DeliveryManagerCommandService {
                 .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.USER_NOT_FOUND));
 
         // 배송 완료로 변경
-        deliveryManager.completeDelivery();
+        deliveryManager.completeDelivery(command.deliveryId());
 
         // 배송 완료 메시지 발행 필요
 
