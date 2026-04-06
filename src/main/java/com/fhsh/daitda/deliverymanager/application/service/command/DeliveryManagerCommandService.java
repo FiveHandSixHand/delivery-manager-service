@@ -1,14 +1,10 @@
 package com.fhsh.daitda.deliverymanager.application.service.command;
 
 import com.fhsh.daitda.deliverymanager.application.client.UserLookupService;
-import com.fhsh.daitda.deliverymanager.application.command.CompleteAssignmentCommand;
-import com.fhsh.daitda.deliverymanager.application.command.CompleteCurrentDeliveryCommand;
-import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
-import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
-import com.fhsh.daitda.deliverymanager.application.result.CompleteAssignmentResult;
-import com.fhsh.daitda.deliverymanager.application.result.CompleteCurrentDeliveryResult;
-import com.fhsh.daitda.deliverymanager.application.result.CreateDeliveryManagerResult;
-import com.fhsh.daitda.deliverymanager.application.result.DeleteDeliveryManagerResult;
+import com.fhsh.daitda.deliverymanager.application.command.*;
+import com.fhsh.daitda.deliverymanager.application.port.DeliveryCompleteEventPort;
+import com.fhsh.daitda.deliverymanager.application.port.event.DeliveryCompleteEvent;
+import com.fhsh.daitda.deliverymanager.application.result.*;
 import com.fhsh.daitda.deliverymanager.domain.entity.AssignmentCursor;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
 import com.fhsh.daitda.deliverymanager.domain.enums.DeliveryManagerType;
@@ -32,6 +28,7 @@ public class DeliveryManagerCommandService {
     private final UserLookupService userLookupService;
     private final DeliveryManagerAssignmentRepository deliveryManagerAssignmentRepository;
     private final AssignmentCursorRepository assignmentCursorRepository;
+    private final DeliveryCompleteEventPort deliveryCompleteEventPort;
 
     // 배송담당자 생성
     public CreateDeliveryManagerResult createDeliveryManager(CreateDeliveryManagerCommand command) {
@@ -86,7 +83,8 @@ public class DeliveryManagerCommandService {
         // 배송 완료로 변경
         deliveryManager.completeDelivery(command.deliveryId());
 
-        // 배송 완료 메시지 발행 필요
+        // 배송 완료 메시지 발행
+        deliveryCompleteEventPort.send(new DeliveryCompleteEvent(command.deliveryId(), deliveryManager.getDeliveryManagerId()));
 
         return new CompleteCurrentDeliveryResult(command.deliveryId(), deliveryManager.isDelivery());
     }
@@ -113,6 +111,14 @@ public class DeliveryManagerCommandService {
         cursor.advanceTo(deliveryManager.getSequence());
 
         return CompleteAssignmentResult.from(deliveryManager, command.deliveryId());
+    }
+
+    // 배송 시작 처리
+    public void startDelivery(StartDeliveryCommand command) {
+        DeliveryManager deliveryManager = deliveryManagerRepository.findById(command.deliveryManagerId())
+                .orElseThrow(() -> new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_FOUND));
+
+        deliveryManager.startDelivery(command.deliveryId());
     }
 
     private void validateUser(UserInfoCommand userInfo, CreateDeliveryManagerCommand command) {
