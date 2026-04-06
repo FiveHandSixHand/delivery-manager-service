@@ -1,4 +1,4 @@
-package com.fhsh.daitda.deliverymanager.infrastructure.repository;
+package com.fhsh.daitda.deliverymanager.infrastructure.persistence.repository;
 
 import com.fhsh.daitda.deliverymanager.application.query.GetDeliveryManagerListQuery;
 import com.fhsh.daitda.deliverymanager.domain.entity.DeliveryManager;
