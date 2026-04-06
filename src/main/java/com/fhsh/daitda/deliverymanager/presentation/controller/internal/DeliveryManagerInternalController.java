@@ -21,7 +21,7 @@ public class DeliveryManagerInternalController {
     private final DeliveryManagerCommandService commandService;
 
     @PostMapping("/assignments")
-    public ResponseEntity<CommonResponse<CompleteAssignmentResponse>> completeAssignment(
+    public CommonResponse<CompleteAssignmentResponse> completeAssignment(
             @RequestBody CompleteAssignmentRequest request
     ) {
 
@@ -29,6 +29,6 @@ public class DeliveryManagerInternalController {
         CompleteAssignmentResult result = commandService.completeAssignment(command);
         CompleteAssignmentResponse response = CompleteAssignmentResponse.from(result);
 
-        return ResponseEntity.ok(CommonResponse.success("배송담당자 배정이 완료되었습니다.", response));
+        return CommonResponse.success("배송담당자 배정이 완료되었습니다.", response);
     }
 }
