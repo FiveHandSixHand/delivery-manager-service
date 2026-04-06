@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
+import java.util.Objects;
 import java.util.UUID;
 
 /*
@@ -136,7 +137,7 @@ public class DeliveryManager extends BaseUserEntity {
         if (!this.isDelivery) {
             throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_DELIVERING);
         }
-        if (this.deliveryId != deliveryId) {
+        if (!Objects.equals(this.deliveryId, deliveryId)) {
             throw new BusinessException(DeliveryManagerErrorCode.NOT_CURRENT_DELIVERY);
         }
 
