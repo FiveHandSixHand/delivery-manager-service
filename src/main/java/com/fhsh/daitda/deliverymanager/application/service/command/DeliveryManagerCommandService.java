@@ -16,6 +16,8 @@ import com.fhsh.daitda.exception.BusinessException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.UUID;
 
@@ -83,8 +85,22 @@ public class DeliveryManagerCommandService {
         // 배송 완료로 변경
         deliveryManager.completeDelivery(command.deliveryId());
 
-        // 배송 완료 메시지 발행
-        deliveryCompleteEventPort.send(new DeliveryCompleteEvent(command.deliveryId(), deliveryManager.getDeliveryManagerId()));
+        // 배송 완료 메시지
+        DeliveryCompleteEvent event = new DeliveryCompleteEvent(command.deliveryId(), deliveryManager.getDeliveryManagerId());
+
+        // 트랜잭션 롤백 시 메시지가 발행되지 않도록 커밋 이후에 발행
+        if (TransactionSynchronizationManager.isActualTransactionActive()) {
+            TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+                @Override
+                public void afterCommit() {
+                    // 메시지 발행
+                    deliveryCompleteEventPort.send(event);
+                }
+            });
+        } else {
+            // 트랜잭션이 없으면 즉시 발행
+            deliveryCompleteEventPort.send(event);
+        }
 
         return new CompleteCurrentDeliveryResult(command.deliveryId(), deliveryManager.isDelivery());
     }
