@@ -201,6 +201,7 @@ public class DeliveryManagerCommandServiceTest {
             assertThat(deliveryManager.isDelivery()).isFalse();
 
             then(repository).should().findByUserId(userId);
+            then(deliveryCompleteEventPort).should().send(any());
         }
 
         @Test
@@ -233,6 +234,7 @@ public class DeliveryManagerCommandServiceTest {
                     .hasMessage(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_DELIVERING.getDescription());
 
             then(repository).should().findByUserId(userId);
+            then(deliveryCompleteEventPort).should(never()).send(any());
         }
     }
 
