@@ -126,6 +126,10 @@ public class DeliveryManagerCommandService {
             throw new BusinessException(DeliveryManagerErrorCode.USER_NOT_FOUND);
         }
 
+        if (!"DELIVERY".equals(userInfo.role())) {
+            throw new BusinessException(DeliveryManagerErrorCode.DELIVERY_ROLE_REQUIRED);
+        }
+
         if (command.type() == DeliveryManagerType.COMPANY && userInfo.hubId() == null) {
             throw new BusinessException(DeliveryManagerErrorCode.COMPANY_DELIVERY_MANAGER_HUB_ID_REQUIRED);
         }
