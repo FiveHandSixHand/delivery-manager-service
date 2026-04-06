@@ -2,6 +2,7 @@ package com.fhsh.daitda.deliverymanager.infrastructure.messaging.producer;
 
 import com.fhsh.daitda.deliverymanager.application.port.DeliveryCompleteEventPort;
 import com.fhsh.daitda.deliverymanager.application.port.event.DeliveryCompleteEvent;
+import com.fhsh.daitda.deliverymanager.infrastructure.config.KafkaTopicConfig;
 import com.fhsh.daitda.deliverymanager.infrastructure.messaging.DeliveryCompleteMessage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -16,6 +17,6 @@ public class DeliveryCompleteRequestProducer implements DeliveryCompleteEventPor
     @Override
     public void send(DeliveryCompleteEvent event) {
         DeliveryCompleteMessage message = DeliveryCompleteMessage.from(event);
-        kafkaTemplate.send("delivery.complete.request", event.deliveryId().toString(), message);
+        kafkaTemplate.send(KafkaTopicConfig.DELIVERY_COMPLETE_REQUEST, event.deliveryId().toString(), message);
     }
 }
