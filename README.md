@@ -147,18 +147,40 @@ X-User-Role: ADMIN
 ---
 
 ## 실행 전제
-아래 인프라는 별도로 실행되어 있어야 합니다.
+아래 인프라가 먼저 실행되어 있어야 합니다.
+- Config Server
+- Eureka Server
 - PostgreSQL
 - Redis
 - Keycloak
 - Zipkin
 
-해당 인프라는 infra-repo를 통해 실행합니다.
+위 인프라는 infra-repo에서 실행할 수 있습니다.
 
 ---
 
 ## 서비스 실행
+
+1. 애플리케이션 빌드
 ```bash
 ./gradlew clean bootJar
-docker compose up --build
+```
 
+2. 컨테이너 실행
+```bash
+docker compose up --build
+```
+
+3. 종료
+```bash
+docker compose down
+```
+
+---
+
+## 환경변수
+
+- SERVER_PORT
+- SPRING_PROFILES_ACTIVE
+- CONFIG_SERVER_URL
+- EUREKA_SERVER_URL
