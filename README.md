@@ -144,3 +144,21 @@ X-User-Role: ADMIN
 
 > 위 서비스들이 내려가 있으면 배송담당자 생성 시 실패할 수 있습니다.
 
+---
+
+## 실행 전제
+아래 인프라는 별도로 실행되어 있어야 합니다.
+- PostgreSQL
+- Redis
+- Keycloak
+- Zipkin
+
+해당 인프라는 infra-repo를 통해 실행합니다.
+
+---
+
+## 서비스 실행
+```bash
+./gradlew clean bootJar
+docker compose up --build
+
