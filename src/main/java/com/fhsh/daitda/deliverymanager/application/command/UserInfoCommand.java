@@ -5,5 +5,6 @@ import java.util.UUID;
 public record UserInfoCommand(
         UUID userId,
         UUID hubId,
-        String slackUserId
+        String slackUserId,
+        String role
 ) { }

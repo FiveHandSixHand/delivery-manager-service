@@ -5,6 +5,7 @@ import com.fhsh.daitda.deliverymanager.application.command.CompleteAssignmentCom
 import com.fhsh.daitda.deliverymanager.application.command.CompleteCurrentDeliveryCommand;
 import com.fhsh.daitda.deliverymanager.application.command.CreateDeliveryManagerCommand;
 import com.fhsh.daitda.deliverymanager.application.command.UserInfoCommand;
+import com.fhsh.daitda.deliverymanager.application.port.DeliveryCompleteEventPort;
 import com.fhsh.daitda.deliverymanager.application.result.CompleteAssignmentResult;
 import com.fhsh.daitda.deliverymanager.application.result.CompleteCurrentDeliveryResult;
 import com.fhsh.daitda.deliverymanager.domain.entity.AssignmentCursor;
@@ -52,6 +53,8 @@ public class DeliveryManagerCommandServiceTest {
     private DeliveryManagerAssignmentRepository assignmentRepository;
     @Mock
     private AssignmentCursorRepository cursorRepository;
+    @Mock
+    private DeliveryCompleteEventPort deliveryCompleteEventPort;
 
     @Nested
     @DisplayName("배송담당자 생성")
@@ -68,7 +71,7 @@ public class DeliveryManagerCommandServiceTest {
             CreateDeliveryManagerCommand command = new CreateDeliveryManagerCommand(targetUserId, DeliveryManagerType.COMPANY);
 
             // 예시 사용자 정보
-            UserInfoCommand userInfo = new UserInfoCommand(targetUserId, hubId, "exampleId");
+            UserInfoCommand userInfo = new UserInfoCommand(targetUserId, hubId, "exampleId", "DELIVERY");
 
             given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
             given(repository.existsByUserId(targetUserId)).willReturn(false);
@@ -98,7 +101,7 @@ public class DeliveryManagerCommandServiceTest {
 
             CreateDeliveryManagerCommand command = new CreateDeliveryManagerCommand(targetUserId, DeliveryManagerType.COMPANY);
 
-            UserInfoCommand userInfo = new UserInfoCommand(targetUserId, hubId, "exampleId");
+            UserInfoCommand userInfo = new UserInfoCommand(targetUserId, hubId, "exampleId", "DELIVERY");
 
             given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
             given(repository.existsByUserId(targetUserId)).willReturn(false);
@@ -125,7 +128,7 @@ public class DeliveryManagerCommandServiceTest {
                     new CreateDeliveryManagerCommand(targetUserId, DeliveryManagerType.COMPANY);
 
             UserInfoCommand userInfo =
-                    new UserInfoCommand(targetUserId, hubId, "exampleId");
+                    new UserInfoCommand(targetUserId, hubId, "exampleId", "DELIVERY");
 
             given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
             // 해당 userId의 배송담당자가 이미 존재하므로 true 반환
@@ -150,7 +153,7 @@ public class DeliveryManagerCommandServiceTest {
                     new CreateDeliveryManagerCommand(targetUserId, DeliveryManagerType.COMPANY);
 
             UserInfoCommand userInfo =
-                    new UserInfoCommand(targetUserId, null, "exampleId");
+                    new UserInfoCommand(targetUserId, null, "exampleId", "DELIVERY");
 
             given(userLookupService.getUser(targetUserId)).willReturn(userInfo);
 
@@ -198,6 +201,7 @@ public class DeliveryManagerCommandServiceTest {
             assertThat(deliveryManager.isDelivery()).isFalse();
 
             then(repository).should().findByUserId(userId);
+            then(deliveryCompleteEventPort).should().send(any());
         }
 
         @Test
@@ -230,6 +234,7 @@ public class DeliveryManagerCommandServiceTest {
                     .hasMessage(DeliveryManagerErrorCode.DELIVERY_MANAGER_NOT_DELIVERING.getDescription());
 
             then(repository).should().findByUserId(userId);
+            then(deliveryCompleteEventPort).should(never()).send(any());
         }
     }
 

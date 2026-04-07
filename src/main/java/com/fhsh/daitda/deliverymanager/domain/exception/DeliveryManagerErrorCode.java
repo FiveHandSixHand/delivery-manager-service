@@ -16,6 +16,8 @@ public enum DeliveryManagerErrorCode implements ErrorCode {
 
     USER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "userId는 필수입니다."),
     SLACK_ID_REQUIRED(HttpStatus.BAD_REQUEST, "slackId는 필수입니다."),
+    DELIVERY_ROLE_REQUIRED(HttpStatus.BAD_REQUEST, "배송 담당자 권한을 보유한 사용자만 배송 담당자로 생성될 수 있습니다."),
+    DELIVERY_ID_REQUIRED(HttpStatus.BAD_REQUEST, "담당할 배송 아이디가 필요합니다."),
     DELIVERY_MANAGER_TYPE_REQUIRED(HttpStatus.BAD_REQUEST, "배송 담당자 타입은 필수입니다."),
     COMPANY_DELIVERY_MANAGER_HUB_ID_REQUIRED(HttpStatus.BAD_REQUEST, "업체 배송 담당자는 허브 ID가 필요합니다."),
 

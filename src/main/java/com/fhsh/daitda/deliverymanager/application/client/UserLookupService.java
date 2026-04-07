@@ -33,7 +33,8 @@ public class UserLookupService {
         return new UserInfoCommand(
                 data.userId(),
                 data.hubId(),
-                data.slackUserId()
+                data.slackUserId(),
+                data.role()
         );
     }
 
