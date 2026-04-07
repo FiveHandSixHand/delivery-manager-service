@@ -158,29 +158,3 @@ X-User-Role: ADMIN
 위 인프라는 infra-repo에서 실행할 수 있습니다.
 
 ---
-
-## 서비스 실행
-
-1. 애플리케이션 빌드
-```bash
-./gradlew clean bootJar
-```
-
-2. 컨테이너 실행
-```bash
-docker compose up --build
-```
-
-3. 종료
-```bash
-docker compose down
-```
-
----
-
-## 환경변수
-
-- SERVER_PORT
-- SPRING_PROFILES_ACTIVE
-- CONFIG_SERVER_URL
-- EUREKA_SERVER_URL
